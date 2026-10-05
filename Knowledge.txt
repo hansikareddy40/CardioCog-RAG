@@ -1,0 +1,878 @@
+PROJECT CONTEXT — CARDIOCOG-RAG
+================================
+
+PROJECT TITLE
+-------------
+CardioCog-RAG: Explainable Early Prediction of Cognitive Decline Using Cardiovascular Risk Factors, Longitudinal Cognitive Trajectories, APOE/Genetic Information, and Brain PET Biomarkers.
+
+PROJECT GOAL
+------------
+The goal is to develop an explainable multimodal AI framework using NACC data to investigate whether cardiovascular/medical risk factors, longitudinal cognitive trajectories, demographic information, APOE/genetic information, and available amyloid/tau PET biomarkers can be combined to predict future cognitive decline or cognitive-risk progression.
+
+IMPORTANT:
+This is NOT simply an Alzheimer's image-classification project.
+The core idea is MULTIMODAL + LONGITUDINAL + EXPLAINABLE AI.
+
+We want to combine:
+1. Cardiovascular/medical information
+2. Cognitive information over multiple visits
+3. Demographics
+4. APOE/genetic information
+5. Amyloid PET / Tau PET information
+6. Explainability
+7. Evidence-grounded RAG reporting
+
+
+DATA SOURCE
+-----------
+Primary source: National Alzheimer's Coordinating Center (NACC)
+
+Current release:
+NACC Freeze 74 — June 2026.
+
+Official NACC:
+https://www.naccdata.org/
+
+Freeze 74:
+https://www.naccdata.org/publish-with-nacc-data/doi-digital-object-identifier/freeze-74-june-2026/
+
+NACC Data Request:
+https://www.naccdata.org/data-request-process/
+
+NACC Imaging:
+https://www.naccdata.org/about-nacc-data/imaging-data/
+
+NACC Researcher's Guide:
+https://www.naccdata.org/the-nacc-researchers-guide
+
+NACC Multimodal Query Tool:
+https://www.naccdata.org/multimodal-query-tool/
+
+SCAN:
+https://scan.naccdata.org/
+
+CLARiTI:
+https://clariti.naccdata.org/for-researchers/access-data
+
+
+DATA ALREADY DOWNLOADED
+-----------------------
+
+The project already has the following NACC Freeze 74-related files/folders:
+
+1. investigator_ftldlbd_nacc74
+
+2. investigator_clariti_edc_nacc74
+
+3. investigator_scan_clariti_pet_csv_nacc74
+
+4. investigator_scan_pet_mp_csv_nacc74
+
+5. A separate local folder named "pet" was also visible in the project directory.
+
+IMPORTANT DISTINCTION:
+The PET CSV/analysis folders are NOT automatically the same thing as actual PET image files.
+
+NACC provides PET analysis information and also has an imaging access workflow for defaced PET images.
+
+Therefore, before building a 3D PET deep-learning model, we MUST inspect the local "pet" folder and determine:
+- whether actual PET images exist
+- image format
+- number of images
+- unique NACCIDs
+- amyloid vs tau
+- tracer/protocol
+- acquisition dates
+- image dimensions
+- voxel spacing
+- whether images are already processed
+- whether they are registered/normalized
+- whether they are suitable for machine learning
+
+
+WHAT EACH DOWNLOADED DATASET IS FOR
+-----------------------------------
+
+1. investigator_ftldlbd_nacc74
+--------------------------------
+This is a major NACC clinical/UDS/neuropathology/genetics-related dataset containing information from multiple NACC modules.
+
+This is expected to provide much of:
+- longitudinal clinical information
+- cognitive information
+- medical information
+- demographic information
+- genetic information
+- APOE-related information
+- neuropathology-related information
+- FTLD/LBD-related information where applicable
+
+The exact columns MUST be mapped using the NACC Researcher's Data Dictionary (RDD).
+
+DO NOT invent column names.
+DO NOT assume every possible feature exists.
+The actual Freeze 74 RDD/QAF is the authority.
+
+
+2. investigator_clariti_edc_nacc74
+----------------------------------
+This contains CLARiTI Electronic Data Capture information.
+
+It can help identify relevant imaging/PET availability and associated information.
+
+Again, exact fields must be inspected rather than assumed.
+
+
+3. investigator_scan_clariti_pet_csv_nacc74
+-------------------------------------------
+This contains SCAN + CLARiTI PET analysis data.
+
+Expected purpose:
+- PET-derived quantitative information
+- PET metadata
+- quality control information
+- potentially amyloid/tau-related measurements
+- participant identifiers
+- scan dates
+- protocol/tracer information
+
+Exact columns must be inspected.
+
+
+4. investigator_scan_pet_mp_csv_nacc74
+--------------------------------------
+This contains Mixed-Protocol PET analysis data.
+
+It is another PET analysis source and must be investigated for:
+- PET type
+- amyloid/tau classification
+- quantitative measurements
+- tracer
+- protocol
+- date
+- quality/QC
+- participant identifier
+
+Exact fields must be verified.
+
+
+5. local "pet" folder
+---------------------
+This MUST be inspected separately.
+
+We need to determine whether it contains:
+- actual PET image files
+- NIfTI files
+- DICOM files
+- processed PET volumes
+- masks
+- derived images
+- or only CSV/metadata.
+
+Do not assume it contains raw images until verified.
+
+
+CORE FEATURE GROUPS
+-------------------
+
+A. DEMOGRAPHIC FEATURES
+-----------------------
+Use relevant NACC demographic/context variables that are actually available.
+
+Potential categories include:
+- age
+- sex
+- education
+- race/ethnicity
+- other justified demographic variables
+
+Why:
+Demographics provide participant context and are important confounders/covariates when interpreting cognitive outcomes.
+
+IMPORTANT:
+Exact feature names must come from the NACC RDD.
+
+
+B. CARDIOVASCULAR / MEDICAL FEATURES
+------------------------------------
+The project wants to capture cardiovascular and vascular/metabolic burden.
+
+Potential NACC variables/categories to investigate include:
+- blood pressure
+- hypertension-related information
+- diabetes
+- cardiovascular disease
+- cerebrovascular disease
+- vascular risk factors
+- weight
+- height
+- BMI/anthropometrics where available
+- relevant medical history
+- smoking or other relevant risk factors if available and justified
+
+WHY:
+Cardiovascular and cerebrovascular health can be associated with brain health and cognitive decline.
+
+IMPORTANT:
+Do not call every medical variable "cardiovascular".
+Only variables with a defensible cardiovascular/vascular/metabolic relationship should enter the cardiovascular feature group.
+
+
+C. COGNITIVE FEATURES
+---------------------
+Cognitive information is a central component.
+
+We want to investigate NACC cognitive/clinical measures such as:
+- CDR
+- neuropsychological memory measures
+- executive-function measures
+- language measures
+- attention/processing measures
+- orientation or related cognitive measures
+- relevant diagnostic/staging variables
+
+The exact cognitive variables must be mapped from the RDD.
+
+WHY:
+These measurements provide the actual observed cognitive state of the participant.
+
+More importantly, NACC is longitudinal.
+
+Therefore we want to preserve:
+Visit 1 → Visit 2 → Visit 3 → Visit 4 → ...
+
+rather than collapsing everything into a single row.
+
+This allows us to model cognitive trajectory.
+
+
+D. LONGITUDINAL INFORMATION
+---------------------------
+Longitudinal means repeated observations of the SAME participant over time.
+
+Example:
+
+NACCID 1234
+
+Visit 1:
+Cognitive score = X
+
+Visit 2:
+Cognitive score = Y
+
+Visit 3:
+Cognitive score = Z
+
+The model can learn:
+- baseline status
+- direction of change
+- rate of change
+- temporal patterns
+- which visits are informative
+
+Potential derived features:
+- change from baseline
+- change from previous visit
+- annualized cognitive change where justified
+- time between visits
+
+IMPORTANT:
+The target and prediction horizon must be defined BEFORE modelling.
+
+Avoid data leakage.
+
+
+E. GENETIC INFORMATION
+----------------------
+The primary planned genetic feature is APOE.
+
+APOE is relevant because APOE genotype is associated with Alzheimer's disease risk and can provide genetic risk/context.
+
+IMPORTANT:
+APOE is NOT the same thing as whole-genome sequencing.
+
+Do not claim that the project uses complete genomic sequencing unless such data are separately verified and included.
+
+
+F. PET DATA
+-----------
+PET is important because it provides biological/pathological information rather than simply structural anatomy.
+
+Amyloid PET:
+Provides information about amyloid-related pathology.
+
+Tau PET:
+Provides information about tau-related pathology.
+
+Potential quantitative PET features to investigate:
+- SUVR
+- centiloid values where available
+- tracer
+- scan date
+- PET modality/type
+- protocol
+- QC
+- reference-region information where available
+- regional measurements if provided
+
+EXACT PET VARIABLES MUST BE VERIFIED FROM THE NACC PET RDD/files.
+
+
+MRI VS PET
+----------
+MRI:
+- primarily structural/anatomical
+- shows brain structure
+- can provide volume, cortical thickness, atrophy etc.
+
+PET:
+- tracer-based
+- provides information about biological/pathological processes
+- amyloid PET relates to amyloid pathology
+- tau PET relates to tau pathology
+
+The current project is primarily focused on PET, not MRI.
+
+Do not add MRI into the core pipeline unless the project is deliberately expanded later.
+
+
+PET PROCESSING — TWO POSSIBLE ROUTES
+-------------------------------------
+
+ROUTE 1: PET QUANTITATIVE DATA
+------------------------------
+If the NACC PET analysis CSVs already contain suitable quantitative measurements:
+
+PET CSV
+→ clean variables
+→ handle missing values
+→ verify tracer/protocol
+→ normalize/standardize
+→ integrate with clinical/cognitive data
+→ multimodal model
+
+This is the easier and likely more immediately feasible approach.
+
+
+ROUTE 2: ACTUAL PET IMAGES
+--------------------------
+If actual PET images are available and the sample is sufficiently large:
+
+PET image
+→ image QC
+→ identify amyloid/tau
+→ verify tracer/protocol
+→ convert to common format if needed
+→ spatial preprocessing
+→ registration/normalization if required
+→ intensity normalization
+→ optional brain masking
+→ 3D CNN / 3D ResNet
+→ PET embedding
+→ multimodal fusion
+
+IMPORTANT:
+Do NOT assume:
+- voxel size
+- image dimensions
+- preprocessing
+- normalization method
+- scanner/protocol
+- image format
+
+These must be determined from the actual files first.
+
+
+COHORT CONSTRUCTION
+-------------------
+This is one of the most important steps.
+
+We need to identify participants with:
+- valid NACCID
+- baseline cognitive information
+- relevant cardiovascular/medical information
+- demographics
+- APOE where available
+- longitudinal follow-up where required
+- PET where required for PET experiments
+
+Not everyone will have all modalities.
+
+Therefore:
+1. Create a complete NACC clinical cohort.
+2. Determine longitudinal follow-up availability.
+3. Determine PET availability.
+4. Calculate overlap.
+5. Build separate cohorts if necessary:
+   - clinical-only cohort
+   - longitudinal cohort
+   - PET-available cohort
+   - PET-image cohort
+
+
+PROJECT ARCHITECTURE
+--------------------
+
+TIER 1:
+
+Cardiovascular/medical
+        +
+Cognitive longitudinal information
+        +
+Demographics
+        +
+APOE
+        ↓
+Structured multimodal representation
+
+
+TIER 2:
+
+Tier 1 representation
+        +
+Amyloid/Tau PET
+        ↓
+Full multimodal representation
+
+
+LONGITUDINAL MODEL
+------------------
+For repeated visits:
+
+Visit 1
+Visit 2
+Visit 3
+Visit 4
+   ↓
+LSTM / optional Transformer
+   ↓
+temporal representation
+
+Temporal attention can be added to identify which visits contribute more strongly to the prediction.
+
+
+MACHINE LEARNING MODELS
+-----------------------
+
+For structured/tabular data:
+
+1. Logistic Regression
+2. Random Forest
+3. XGBoost
+4. CatBoost
+
+These should be used as baselines/comparisons.
+
+CatBoost is a strong candidate for mixed structured clinical data.
+
+
+DEEP LEARNING
+-------------
+
+1. LSTM
+-------
+Used for longitudinal sequences.
+
+Input:
+Repeated cognitive/clinical observations over visits.
+
+Output:
+Temporal representation.
+
+
+2. Transformer
+--------------
+Optional comparison for longitudinal modelling.
+
+Do not automatically use it if sample size is too small.
+
+
+3. 3D CNN / 3D ResNet
+---------------------
+Used only if actual PET images are available in sufficient quantity.
+
+Input:
+3D PET volume.
+
+Output:
+PET feature embedding.
+
+
+MULTIMODAL FUSION
+-----------------
+
+Different branches produce representations:
+
+Clinical/Cardio representation
+        +
+Cognitive temporal representation
+        +
+Demographic/genetic representation
+        +
+PET representation
+        ↓
+Fusion layer
+        ↓
+Prediction heads
+
+
+PREDICTION HEADS
+----------------
+
+Potentially two outputs:
+
+1. CLASSIFICATION
+Predict a predefined cognitive-risk category/outcome.
+
+2. REGRESSION
+Predict a predefined continuous cognitive progression/change measure.
+
+IMPORTANT:
+The exact target is NOT finalized yet.
+
+It must be defined after examining:
+- available NACC cognitive variables
+- visit dates
+- follow-up duration
+- diagnostic information
+- sample size.
+
+Do not invent the final target.
+
+
+EXPERIMENTAL DESIGN
+-------------------
+
+We should run experiments progressively.
+
+BASELINES:
+1. Demographics only
+2. Cognition only
+3. Cardiovascular/medical only
+4. Cognition + demographics
+
+TIER 1:
+5. Cardio + cognition + demographics + APOE
+
+TIER 2:
+6. Tier 1 + quantitative PET
+
+IMAGE EXPERIMENT:
+7. Tier 2 + PET image embedding if sufficient images exist
+
+ABLATION:
+8. Remove cardiovascular features
+9. Remove PET
+10. Remove APOE
+11. Remove longitudinal information
+12. Compare models
+
+This lets us answer:
+"Does each modality actually contribute useful information?"
+
+
+EVALUATION
+----------
+
+Classification:
+- AUROC
+- AUPRC
+- Accuracy
+- Precision
+- Recall
+- F1
+- Sensitivity
+- Specificity
+- calibration where appropriate
+
+Regression:
+- MAE
+- RMSE
+- R²
+
+For imbalanced outcomes:
+AUPRC and class-specific metrics should be considered in addition to accuracy.
+
+
+DATA LEAKAGE
+------------
+
+THIS IS CRITICAL.
+
+The same NACC participant can have multiple visits.
+
+Therefore:
+
+WRONG:
+Randomly split individual rows.
+
+CORRECT:
+Split by NACCID.
+
+All visits from one participant must remain in the same train/validation/test partition.
+
+Also:
+- fit imputer only on training data
+- fit scaler only on training data
+- fit encoder only on training data
+- do not use future cognitive measurements as predictors of the future target
+- define baseline and prediction horizon before modelling
+- be careful with PET timing
+- do not use post-baseline information if the research question is early prediction from baseline.
+
+
+EXPLAINABILITY
+--------------
+
+SHAP:
+Used primarily for structured/tabular features.
+
+It answers:
+"Which features contributed to this prediction?"
+
+Example:
+- APOE
+- blood pressure
+- diabetes
+- cognitive score
+- age
+- PET measurement
+
+SHAP does NOT prove causality.
+
+
+GRAD-CAM:
+Only for CNN-based PET image modelling.
+
+It can highlight image regions that contributed to the model output.
+
+
+TEMPORAL ATTENTION:
+Can show which visits/time points receive higher model attention.
+
+
+RAG
+---
+
+RAG = Retrieval-Augmented Generation.
+
+It is NOT the prediction model.
+
+The prediction model produces:
+- risk
+- progression prediction
+- feature importance
+- PET/image explanation
+
+Then RAG retrieves relevant trusted scientific/clinical evidence.
+
+Pipeline:
+
+Prediction
+   ↓
+SHAP / attention / Grad-CAM
+   ↓
+retrieve supporting literature
+   ↓
+LLM
+   ↓
+evidence-grounded explanation
+
+
+LLM ROLE
+--------
+The LLM should NOT independently diagnose the participant.
+
+It should:
+- summarize model outputs
+- summarize important contributing features
+- explain relevant evidence
+- generate a readable report
+- clearly distinguish prediction from medical fact
+- cite retrieved evidence
+
+
+IMPORTANT SCIENTIFIC POSITION
+-----------------------------
+This is a research prediction/decision-support framework.
+
+It should NOT be described as a clinically validated diagnostic system.
+
+The model predicts statistical risk/progression based on the available NACC data.
+
+
+WHY THIS PROJECT IS INTERESTING
+-------------------------------
+
+Most single-modality approaches use only:
+- cognitive data
+OR
+- medical data
+OR
+- imaging.
+
+Our approach attempts to combine:
+
+CARDIOVASCULAR / MEDICAL
+        +
+LONGITUDINAL COGNITION
+        +
+DEMOGRAPHICS
+        +
+APOE
+        +
+AMYLOID/TAU PET
+
+The key research idea is:
+
+Can cardiovascular/medical information provide useful additional predictive information when combined with cognitive trajectories and Alzheimer's-related PET biomarkers?
+
+The longitudinal component is especially important because cognitive decline is a process over time, not merely a single measurement.
+
+
+WHAT IS CONFIRMED VS WHAT IS STILL OPEN
+---------------------------------------
+
+CONFIRMED:
+- NACC is the primary dataset.
+- Current release is Freeze 74 / June 2026.
+- The project has the listed NACC files.
+- PET analysis datasets have been downloaded.
+- The project is intended to use multimodal data.
+- Longitudinal cognitive modelling is part of the plan.
+- APOE is the primary genetic feature.
+- Amyloid/Tau PET are planned.
+- Explainability using SHAP is planned.
+- RAG is intended as an evidence/reporting layer.
+
+MUST STILL BE VERIFIED:
+- exact NACC column names
+- exact cardiovascular variables
+- exact cognitive variables
+- exact APOE encoding
+- exact PET variables
+- exact amyloid/tau fields
+- exact PET sample size
+- exact PET-image sample size
+- whether local "pet" folder contains actual images
+- image format
+- image dimensions
+- voxel spacing
+- tracer distribution
+- QC fields
+- exact prediction target
+- exact prediction horizon
+- final cohort size
+- whether 3D PET modelling is statistically feasible
+
+
+CURRENT RESTART PLAN
+-------------------
+
+STEP 1:
+Inspect every downloaded NACC file.
+
+STEP 2:
+Read the NACC Researcher's Data Dictionary.
+
+STEP 3:
+Create a master feature dictionary:
+
+NACC variable
+→ variable meaning
+→ feature group
+→ data type
+→ missing-code meaning
+→ preprocessing
+→ model branch
+→ target/leakage status
+
+STEP 4:
+Inspect longitudinal visit structure.
+
+STEP 5:
+Build baseline cohort.
+
+STEP 6:
+Determine follow-up availability.
+
+STEP 7:
+Inspect PET analysis files.
+
+STEP 8:
+Determine amyloid/tau participant overlap.
+
+STEP 9:
+Inspect local PET image folder.
+
+STEP 10:
+Determine whether actual image modelling is feasible.
+
+STEP 11:
+Define final prediction target and prediction horizon.
+
+STEP 12:
+Create participant-level train/validation/test split.
+
+STEP 13:
+Run simple baselines.
+
+STEP 14:
+Run Tier 1 multimodal model.
+
+STEP 15:
+Add PET for Tier 2.
+
+STEP 16:
+Add PET image branch only if feasible.
+
+STEP 17:
+Perform ablation studies.
+
+STEP 18:
+Perform SHAP/Grad-CAM/temporal explanations.
+
+STEP 19:
+Build RAG evidence layer.
+
+STEP 20:
+Generate final evidence-grounded report.
+
+
+VERY IMPORTANT INSTRUCTIONS FOR WORKING ON THIS PROJECT
+--------------------------------------------------------
+
+1. Never invent NACC variables.
+2. Never assume a feature exists just because it is medically relevant.
+3. Always distinguish:
+   - NACC-confirmed feature
+   - proposed derived feature
+   - modelling choice.
+4. Use the NACC RDD as the authority for exact variable definitions.
+5. Do not assume the PET CSV files are raw PET images.
+6. Do not assume actual PET images are available until the local files/access are verified.
+7. Do not include MRI unless explicitly added later.
+8. Do not claim APOE represents all genetics.
+9. Do not use future information to predict the past.
+10. Split by NACCID to prevent longitudinal leakage.
+11. Do not finalize the prediction target until the actual longitudinal data are inspected.
+12. Do not choose PET preprocessing parameters until the actual images are inspected.
+13. Do not make causal claims from SHAP.
+14. RAG/LLM is an explanation/evidence layer, not the primary prediction model.
+15. Prioritize a scientifically defensible pipeline over adding unnecessary models.
+
+THE SIMPLEST DESCRIPTION OF THE PROJECT
+----------------------------------------
+
+We are using NACC longitudinal clinical data to combine cardiovascular/medical risk factors, cognitive trajectories, demographics, APOE, and Alzheimer's-related PET biomarkers.
+
+The model will learn from these complementary information sources to predict future cognitive risk/progression.
+
+Then SHAP, temporal attention and potentially Grad-CAM explain the prediction.
+
+Finally, RAG retrieves trusted scientific evidence and an LLM converts the model outputs into an understandable evidence-grounded explanation.
+
+The first task is NOT modelling.
+
+The first task is:
+AUDIT THE ACTUAL NACC FILES → MAP EXACT VARIABLES → BUILD THE COHORT → VERIFY PET → DEFINE TARGET → THEN MODEL.
