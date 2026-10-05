@@ -1,0 +1,53 @@
+# --- NACC data: never commit (data use agreement) ---
+# Everything under data/ is ignored, whatever its type.
+data/
+# Belt and braces: participant-level formats are ignored anywhere in the repo.
+*.csv
+*.tsv
+*.xlsx
+*.xls
+*.parquet
+*.feather
+*.pkl
+*.pickle
+*.sas7bdat
+*.sav
+*.dta
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.7z
+# Imaging
+*.dcm
+*.dicom
+*.nii
+*.nii.gz
+*.img
+*.hdr
+*.mgz
+*.mgh
+*.nrrd
+*.v
+*.ima
+*.npy
+*.npz
+*.h5
+*.hdf5
+
+# Participant-level audit output (only reports/*.md and *_aggregate.json are shareable)
+reports/_participant_level/
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.ipynb_checkpoints/
+.env
+
+# --- Editors / OS ---
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store
