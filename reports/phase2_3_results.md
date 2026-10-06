@@ -42,19 +42,19 @@ Dementia within 3 years, 48 first-visit features. AUROC with 95% bootstrap inter
 
 | Model | Test AUROC | Test AUPRC | External AUROC |
 |---|---|---|---|
-| Logistic regression | 0.936 (0.924-0.949) | 0.720 | 0.945 (0.937-0.953) |
-| Random forest | 0.932 (0.919-0.944) | 0.704 | 0.940 (0.932-0.948) |
-| XGBoost | 0.938 (0.926-0.948) | 0.711 | 0.946 (0.938-0.954) |
-| MLP (neural network) | 0.939 (0.926-0.949) | 0.721 | 0.946 (0.938-0.954) |
-| FT-Transformer | 0.939 (0.927-0.949) | 0.722 | 0.945 (0.937-0.953) |
+| Logistic regression | 0.936 (0.924-0.949) | 0.721 | 0.945 (0.937-0.953) |
+| Random forest | 0.932 (0.919-0.944) | 0.704 | 0.940 (0.931-0.948) |
+| XGBoost | 0.938 (0.925-0.948) | 0.713 | 0.946 (0.938-0.954) |
+| MLP (neural network) | 0.938 (0.926-0.949) | 0.721 | 0.946 (0.938-0.954) |
+| FT-Transformer | 0.939 (0.927-0.949) | 0.720 | 0.945 (0.937-0.953) |
 
 ![Model comparison](figures/06_model_comparison.png)
 
 The deep models match gradient boosting and logistic regression; none is measurably better. The headline AUROC is inflated by mixing normal and MCI participants. Within people who had MCI at the index visit it is about 0.84; within those who were normal it is about 0.84 to 0.89 with a wide interval (24 converters in the test set).
 
-Predicted risks are well calibrated on the test set and slightly high on the external centres (Brier 0.067 against 0.124 for always predicting the base rate).
+Predicted risks are well calibrated on the test set and slightly high on the external centres (Brier 0.066 against 0.124 for always predicting the base rate).
 
-## Result 2: cardiovascular features do not add predictive value once cognition is known
+## Result 2: cardiovascular features add almost nothing once cognition is known
 
 Gain in AUROC from adding each group to a model that already has all the others (XGBoost, paired bootstrap):
 
@@ -62,23 +62,23 @@ Gain in AUROC from adding each group to a model that already has all the others 
 |---|---|---|
 | Cognitive tests | +0.022 (+0.015 to +0.029) | +0.019 (+0.013 to +0.024) |
 | Clinical stage (CDR-SB, diagnosis) | +0.015 (+0.008 to +0.023) | +0.020 (+0.015 to +0.027) |
-| Demographics | +0.011 (+0.007 to +0.016) | +0.010 (+0.007 to +0.014) |
-| Genetics / APOE | +0.003 (+0.001 to +0.004) | +0.001 (-0.000 to +0.002) |
-| Cardiovascular / medical | +0.0002 (-0.001 to +0.002) | +0.0004 (-0.001 to +0.001) |
+| Demographics | +0.010 (+0.006 to +0.015) | +0.009 (+0.006 to +0.013) |
+| Genetics / APOE | +0.003 (+0.002 to +0.004) | +0.001 (-0.000 to +0.002) |
+| Cardiovascular / medical | +0.001 (-0.000 to +0.003) | +0.001 (0.000 to +0.002) |
 
 ![Feature groups](figures/06_feature_groups.png)
 
-Added to demographics and APOE only (before any cognitive data), the cardiovascular group gains +0.024 on the test set but +0.003 on the external centres, where the interval includes zero.
+Added to demographics and APOE only (before any cognitive data), the cardiovascular group gains +0.024 on the test set but +0.004 on the external centres, where the interval includes zero.
 
-Stated carefully: in NACC, once current cognition is known, late-life cardiovascular and medical records did not improve 3-year prediction of dementia. Mid-life exposure is not observed in this cohort, so this is not evidence that vascular health is unrelated to dementia.
+Stated carefully: in NACC, once current cognition is known, late-life cardiovascular and medical records improved 3-year prediction of dementia by about a tenth of a percentage point of AUROC at most, which is not meaningful. Mid-life exposure is not observed in this cohort, so this is not evidence that vascular health is unrelated to dementia.
 
 ## Result 3: history adds very little
 
 | Model | Test AUROC | Gain vs no history | External AUROC | Gain vs no history |
 |---|---|---|---|---|
-| XGBoost, landmark visit only | 0.920 | reference | 0.952 | reference |
-| XGBoost + trajectory features | 0.923 | +0.003 (-0.006 to +0.011) | 0.956 | +0.003 (-0.000 to +0.007) |
-| GRU over the visit sequence | 0.920 | -0.000 (-0.011 to +0.009) | 0.958 | +0.005 (+0.001 to +0.009) |
+| XGBoost, landmark visit only | 0.919 | reference | 0.953 | reference |
+| XGBoost + trajectory features | 0.922 | +0.003 (-0.006 to +0.011) | 0.956 | +0.003 (-0.001 to +0.007) |
+| GRU over the visit sequence | 0.920 | +0.000 (-0.011 to +0.010) | 0.958 | +0.005 (+0.001 to +0.008) |
 
 The current visit already reflects past decline, so the slope adds little. A recurrent network is not needed for accuracy here.
 
@@ -86,15 +86,19 @@ The current visit already reflects past decline, so the slope adds little. A rec
 
 | Category | Share of importance | Range over 8 retrained models |
 |---|---|---|
-| Clinical stage (CDR-SB, diagnosis) | 41% | 37-46% |
+| Clinical stage (CDR-SB, diagnosis) | 41% | 36-46% |
 | Cognitive tests | 35% | 31-39% |
-| Demographics (mostly age) | 16% | 11-16% |
+| Demographics (mostly age) | 15% | 11-16% |
 | Cardiovascular / medical | 5% (main model) | 6-10% |
 | Genetics / APOE | 4% | 1-5% |
 
 ![SHAP groups](figures/07_shap_groups.png)
 
 Category-level importance is stable. The order of individual mid-ranked features is not (age moves between 4th and 8th), so only category-level statements belong in the report. Directions are clinically sensible. Race appears in the top 15 and needs a subgroup check in validation.
+
+## Checks
+
+`python scripts/verify_results.py` runs 17 independent checks (raw files untouched, clean splits, no future information in any feature, labels recomputed a second way, shuffled-label test, metrics recomputed from saved predictions, retraining with a new seed). All pass; the output is in `reports/verification_report.json`. Two issues found by these checks were fixed before the numbers above were produced (see notebook 05, section 6).
 
 ## Limits
 

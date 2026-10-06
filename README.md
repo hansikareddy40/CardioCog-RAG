@@ -88,6 +88,10 @@ Available datasets:
 | `notebooks/08` | Do amyloid and tau PET measures add to the clinical model? |
 | `notebooks/09` | Validation: subgroups, thresholds, calibration, decision curve, survival check |
 | `notebooks/10` | Missing modalities: modality dropout and late fusion |
+| `notebooks/11` | PET images: conversion, registration, SUVR check against NACC, amyloid CNN and Grad-CAM |
+| `notebooks/12` | Evidence assistant: retrieval, guardrails, evaluation |
+| `docs/viva_notes.md` | Likely questions with evidence-based answers |
+| `rag/` | Evidence sources and test questions |
 | `scripts/` | Pipeline code (see below) |
 | `app/app.py` | Clinician-facing prototype with a modality checklist |
 | `data/`, `models/` | NACC data and trained models. Not in the repository (data use agreement) |
@@ -105,6 +109,13 @@ python scripts/explain.py             # SHAP
 python scripts/train_pet.py           # PET measures experiment
 python scripts/validate.py            # validation analyses
 python scripts/train_final.py         # missing-modality model, saved to models/
+python scripts/pet_convert.py         # raw PET DICOM -> static 3D images
+python scripts/pet_register.py --pass 1 && python scripts/pet_register.py --pass 2
+python scripts/pet_suvr.py            # image SUVR, checked against NACC's values
+python scripts/train_pet_image.py     # amyloid image classifier and Grad-CAM (GPU)
+python scripts/rag_build.py           # evidence library
+python scripts/rag_eval.py --llm      # evidence assistant tests
+python scripts/verify_results.py      # 17 independent checks on data, labels and results
 streamlit run app/app.py              # interface
 ```
 
@@ -116,9 +127,10 @@ Dementia within 3 years, among participants not demented at the index visit; all
 
 - AUROC 0.94 on the internal test set and 0.95 on nine held-out centres; about 0.84 among participants with MCI.
 - Logistic regression, random forest, XGBoost, an MLP and an FT-Transformer perform the same.
-- Cardiovascular and medical features add no measurable predictive value once cognition is known (+0.0002 AUROC).
+- Cardiovascular and medical features add almost nothing once cognition is known (about +0.001 AUROC).
 - Visit history adds very little beyond the current visit (+0.003 to +0.005).
-- Amyloid and tau PET measures did not measurably improve the clinical model over 2 to 3 years.
+- Amyloid and tau PET measures did not demonstrably improve the clinical model over 2 to 3 years, under two ways of matching scans to visits.
+- A PET-only image pipeline built from raw DICOM reproduces the PET core's amyloid SUVR (correlation 0.98 over 318 scans). A 3D CNN classifies amyloid status at AUROC 0.96, below the single SUVR measurement (0.98).
 - Training with modality dropout keeps predictions calibrated when whole sections of input are missing.
 
 ## References

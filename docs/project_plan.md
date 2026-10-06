@@ -2,6 +2,24 @@
 
 This plan follows from the Phase 1 exploration (`reports/phase1_eda_summary.md` and the four notebooks). Each phase lists what is built, why that method fits this data, what it produces, and the decisions the team must make and be able to defend.
 
+## Status: what was done, and where the outcome differed from the plan
+
+| Phase | Status | Outcome | Where |
+|---|---|---|---|
+| 1 Exploration | Done | Data catalogue, variable map, feasibility of each modality | Notebooks 01-04 |
+| 2 Cleaning, cohort, target | Done | Suggested defaults adopted; change the constants in `scripts/build_dataset.py` to revisit | Notebook 05 |
+| 3 Tabular and longitudinal models | Done | All five model types equal (AUROC about 0.94); cardiovascular features and visit history add almost nothing | Notebook 06 |
+| 4 PET numbers | Done | No measurable gain over the clinical model at 2 to 3 years | Notebook 08 |
+| 5 PET images | Done for amyloid | Pipeline validated against NACC SUVR (r = 0.98); amyloid-status CNN slightly below the SUVR baseline; Grad-CAM diffuse. Tau image quantification not done (no standard mask) | Notebook 11 |
+| 6 Fusion with missing modalities | Done | Modality dropout on the tabular model plus late fusion for PET. The intermediate-fusion deep network (approach C) was not built: the data gave no reason to expect a gain | Notebook 10 |
+| 7 Explainability | Done | SHAP by category with stability check | Notebook 07 |
+| 8 Validation | Done | Subgroups, thresholds, calibration, decision curve, survival check. Temporal validation and confirmed-conversion sensitivity analysis not done | Notebook 09 |
+| 9 Interface | Done | Streamlit prototype with modality checklist | `app/app.py` |
+| 10 Evidence assistant | Done | 11 open-access sources, hybrid retrieval, guardrails, local language model with quotation fallback | Notebook 12 |
+| 11 Report and viva | Notes written | `docs/viva_notes.md`; the written report is the team's to produce | |
+
+The decisions listed in each phase below were taken at their suggested defaults so that work could proceed. They remain the team's to confirm and justify.
+
 ## What the project is, stated honestly
 
 **A research prototype** that predicts future cognitive decline from multimodal NACC data, explains each prediction, and presents the supporting published evidence.

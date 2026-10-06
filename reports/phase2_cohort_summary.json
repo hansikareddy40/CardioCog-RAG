@@ -124,7 +124,61 @@
     "events": 469
    }
   },
-  "PET (visit nearest scan) | y_dementia_3y": {
+  "PET strict (first visit on or after scan) | y_dementia_3y": {
+   "train": {
+    "n": 245,
+    "events": 31
+   },
+   "val": {
+    "n": 56,
+    "events": 5
+   },
+   "test": {
+    "n": 52,
+    "events": 6
+   },
+   "external": {
+    "n": 205,
+    "events": 28
+   }
+  },
+  "PET strict (first visit on or after scan) | y_dementia_2y": {
+   "train": {
+    "n": 331,
+    "events": 25
+   },
+   "val": {
+    "n": 71,
+    "events": 3
+   },
+   "test": {
+    "n": 65,
+    "events": 5
+   },
+   "external": {
+    "n": 290,
+    "events": 24
+   }
+  },
+  "PET strict (first visit on or after scan) | y_cdrsb_rise_3y": {
+   "train": {
+    "n": 254,
+    "events": 60
+   },
+   "val": {
+    "n": 58,
+    "events": 11
+   },
+   "test": {
+    "n": 57,
+    "events": 16
+   },
+   "external": {
+    "n": 225,
+    "events": 71
+   }
+  },
+  "PET nearest (visit closest to scan) | y_dementia_3y": {
    "train": {
     "n": 649,
     "events": 110
@@ -142,7 +196,7 @@
     "events": 67
    }
   },
-  "PET (visit nearest scan) | y_dementia_2y": {
+  "PET nearest (visit closest to scan) | y_dementia_2y": {
    "train": {
     "n": 911,
     "events": 85
@@ -160,7 +214,7 @@
     "events": 50
    }
   },
-  "PET (visit nearest scan) | y_cdrsb_rise_3y": {
+  "PET nearest (visit closest to scan) | y_cdrsb_rise_3y": {
    "train": {
     "n": 699,
     "events": 204
@@ -180,31 +234,38 @@
   }
  },
  "pet_index": {
+  "participants": 1653,
+  "with_amyloid": 1481,
+  "with_tau": 713,
+  "with_image": 285
+ },
+ "pet_index_nearest": {
   "participants": 3809,
   "with_amyloid": 3525,
   "with_tau": 1647,
-  "with_image": 368
+  "scan_after_visit_pct": 75.2165922814387,
+  "median_days_scan_after_visit": 55.0
  },
  "cog_norm_reference_n": {
-  "LOGIMEM": 6531,
-  "MEMUNITS": 6532,
-  "CRAFTVRS": 6218,
-  "CRAFTDVR": 6216,
-  "UDSBENTD": 6180,
-  "DIGIF": 6547,
-  "DIGIB": 6547,
-  "DIGFORCT": 6337,
-  "DIGBACCT": 6337,
-  "TRAILA": 12881,
-  "TRAILB": 12662,
-  "WAIS": 6326,
-  "ANIMALS": 13101,
-  "VEG": 12859,
-  "BOSTON": 6530,
-  "MINTTOTS": 6196,
-  "UDSVERFC": 6280,
-  "UDSBENTC": 6189,
-  "NACCMMSE": 6779,
-  "MOCATOTS": 6270
+  "LOGIMEM": 6528,
+  "MEMUNITS": 6529,
+  "CRAFTVRS": 6212,
+  "CRAFTDVR": 6210,
+  "UDSBENTD": 6174,
+  "DIGIF": 6544,
+  "DIGIB": 6544,
+  "DIGFORCT": 6331,
+  "DIGBACCT": 6331,
+  "TRAILA": 12872,
+  "TRAILB": 12653,
+  "WAIS": 6324,
+  "ANIMALS": 13092,
+  "VEG": 12850,
+  "BOSTON": 6527,
+  "MINTTOTS": 6190,
+  "UDSVERFC": 6274,
+  "UDSBENTC": 6183,
+  "NACCMMSE": 6776,
+  "MOCATOTS": 6264
  }
 }

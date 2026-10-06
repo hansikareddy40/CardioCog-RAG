@@ -157,7 +157,8 @@ def main():
     oof = {k: np.zeros(len(y)) for k in ["Cortical SUVR (one number)", "Regional logistic model", "3D CNN"]}
     cam_sum, cam_n, B = np.zeros(SHAPE), 0, block_features(X)
     for f, (tr, te) in enumerate(folds):
-        oof["Cortical SUVR (one number)"][te] = df.image_suvr.to_numpy()[te]
+        suvr = df.image_suvr.to_numpy()                    # rescaled to 0-1 so it can be scored like a probability; order unchanged
+        oof["Cortical SUVR (one number)"][te] = ((suvr - suvr.min()) / (suvr.max() - suvr.min()))[te]
         mu, sd = B[tr].mean(0), B[tr].std(0) + 1e-6
         lr = LogisticRegression(C=0.01, max_iter=3000).fit((B[tr] - mu) / sd, y[tr])
         oof["Regional logistic model"][te] = lr.predict_proba((B[te] - mu) / sd)[:, 1]
@@ -167,6 +168,7 @@ def main():
             cam_sum += grad_cam(model, X[i]); cam_n += 1
         print(f"[image] fold {f + 1}: CNN AUROC {roc_auc_score(y[te], oof['3D CNN'][te]):.3f} ({time.time() - t0:.0f}s)", flush=True)
 
+    pd.DataFrame({"image_id": df.image_id, "y": y, **oof}).to_csv(nu.REPO / "data" / "processed" / "pet_cnn_oof.csv", index=False)
     res = {"n": int(len(y)), "positive": int(y.sum()), "tracers": df.tracer.value_counts().to_dict(), "volume_shape": list(SHAPE),
            "cnn_parameters": int(sum(p.numel() for p in Small3DCNN().parameters())), "epochs": EPOCHS, "models": {}}
     for name, p in oof.items():
@@ -176,9 +178,12 @@ def main():
                                   if (m := (df.tracer == t).to_numpy()).sum() >= 20 and 0 < y[m].sum() < m.sum()}
     # Grad-CAM: where does the network look, on average, for true positives?
     cam = cam_sum / max(cam_n, 1)
+    np.save(nu.REPO / "data" / "processed" / "pet_cnn_cam.npy", cam)
     top = cam >= np.quantile(cam, 0.95)
     res["grad_cam"] = {"scans_averaged": int(cam_n), "share_of_top5pct_inside_cortical_region": float((top & ctx).sum() / top.sum()),
-                       "share_expected_by_chance": float(ctx.mean())}
+                       "share_expected_by_chance": float(ctx.mean()),
+                       "mean_cam_inside_cortical_region": float(cam[ctx].mean()), "mean_cam_whole_volume": float(cam.mean()),
+                       "share_of_volume_above_quarter_of_max": float((cam >= 0.25 * cam.max()).mean())}
     mean_pos, mean_neg = X[y == 1].mean(0)[0], X[y == 0].mean(0)[0]
     nu.set_style()
     fig, axes = plt.subplots(3, 4, figsize=(11, 8))
@@ -192,9 +197,10 @@ def main():
         axes[2, j].contour(ctx[sl], colors="#2a78d6", linewidths=0.6)
     for ax in axes.ravel():
         ax.set_xticks([]); ax.set_yticks([]); ax.grid(False)
-    axes[0, 0].set_ylabel("Mean of amyloid-negative scans"); axes[1, 0].set_ylabel("Mean of amyloid-positive scans")
-    axes[2, 0].set_ylabel("Mean Grad-CAM (blue = standard cortical region)")
-    fig.suptitle("Group averages: SUVR images and where the 3D CNN looks", x=0.01, ha="left", fontweight="bold")
+    axes[0, 0].set_ylabel("Amyloid negative (mean)"); axes[1, 0].set_ylabel("Amyloid positive (mean)")
+    axes[2, 0].set_ylabel("Grad-CAM (mean)")
+    fig.suptitle("Group averages: SUVR images, and where the 3D CNN looks (blue outline = standard cortical region)",
+                 x=0.01, ha="left", fontweight="bold")
     fig.tight_layout(); nu.savefig(fig, "11_gradcam_mean")
     text = json.dumps(res, indent=1)
     nu.assert_no_ids(text, "PET CNN results")
