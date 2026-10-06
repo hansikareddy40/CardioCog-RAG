@@ -69,7 +69,7 @@ def main():
                 p["source"] in item["expect"] for p in lib.passages if p["short"] in {s["short"] for s in r["sources"]}))
             n_sent.append(len(r["answer"].split(". ")))
         advice_modes = [a.ask(q)["mode"] for q in qs["advice"]]
-        res["generation"] = {"model": rag.LLM_MODEL,
+        res["generation"] = {"model": rag.LLM_NAME,
                              "answered_generatively": float(np.mean([m == "generative" for m in modes])),
                              "fell_back_to_quoting": float(np.mean([m == "extractive" for m in modes])),
                              "said_not_found": float(np.mean([m == "not_found" for m in modes])),

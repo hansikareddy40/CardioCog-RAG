@@ -34,7 +34,8 @@ import numpy as np
 REPO = Path(__file__).resolve().parents[1]
 STORE = REPO / "data" / "external" / "rag"
 EMBED_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
-LLM_MODEL = "Qwen/Qwen2.5-1.5B-Instruct"
+LLM_NAME = "Qwen2.5-1.5B-Instruct"
+LLM_MODEL = str(REPO / "models" / "llm")     # local copy of the open model; nothing is sent out
 MIN_SIMILARITY = 0.35            # below this, the library is treated as having no answer
 TOKEN = re.compile(r"[a-z0-9]+")
 STOP = set("the a an of and or to in for with on by is are was were be been as at from that this it its their which what "
