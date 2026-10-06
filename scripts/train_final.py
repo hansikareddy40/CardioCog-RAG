@@ -113,7 +113,7 @@ def main():
     design = lambda t: np.column_stack([t["clin_logit"]] + [t[c].fillna(med[c]) for c in cols] + [t[c].isna().astype(float) for c in TAU])
     Xf = design(fit)
     mu, sd = Xf.mean(axis=0), Xf.std(axis=0) + 1e-9
-    lr = LogisticRegression(C=1.0, max_iter=2000).fit((Xf - mu) / sd, fit[TARGET].to_numpy(int))
+    lr = LogisticRegression(C=0.3, max_iter=2000).fit((Xf - mu) / sd, fit[TARGET].to_numpy(int))      # few events: shrink firmly
     held = pet[pet.split.isin(["test", "external"]) & (pet.has_amyloid == 1)]
     p_clin = 1 / (1 + np.exp(-held["clin_logit"].to_numpy()))
     p_fused = lr.predict_proba((design(held) - mu) / sd)[:, 1]

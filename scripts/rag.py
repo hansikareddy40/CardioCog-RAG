@@ -134,11 +134,11 @@ class Generator:
                   "If the sources do not answer the question, reply exactly: NOT IN SOURCES. "
                   "Do not give treatment, medication or dosing advice for an individual. Write 2 to 4 sentences.")
         user = f"Sources:\n{sources}\n\n" + (f"Model output for context (not a source): {model_context}\n\n" if model_context else "") + f"Question: {question}"
-        ids = tok.apply_chat_template([{"role": "system", "content": system}, {"role": "user", "content": user}],
-                                      add_generation_prompt=True, return_tensors="pt").to(model.device)
+        enc = tok.apply_chat_template([{"role": "system", "content": system}, {"role": "user", "content": user}],
+                                      add_generation_prompt=True, return_tensors="pt", return_dict=True).to(model.device)
         with torch.no_grad():
-            out = model.generate(ids, max_new_tokens=220, do_sample=False, repetition_penalty=1.05)
-        return tok.decode(out[0, ids.shape[1]:], skip_special_tokens=True).strip()
+            out = model.generate(**enc, max_new_tokens=220, do_sample=False, repetition_penalty=1.05)
+        return tok.decode(out[0, enc["input_ids"].shape[1]:], skip_special_tokens=True).strip()
 
 
 def citations_valid(text: str, n_hits: int) -> bool:

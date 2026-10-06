@@ -14,6 +14,10 @@ combines them. A participant without PET simply keeps the clinical risk.
 
 Comparisons are paired: the same test participants, with and without PET.
 
+Two designs are reported (see build_dataset.add_pet): "strict", where the scan
+is on or before the index visit, and "nearest", which is larger but lets the
+scan fall shortly after the visit.
+
 Output  reports/phase4_pet_results.json (aggregate only)
 Usage:  python scripts/train_pet.py
 """
@@ -63,6 +67,20 @@ def fuse(train: pd.DataFrame, test: pd.DataFrame, pet_cols: list[str], target: s
     return m.predict_proba((Xte[:, keep] - mu) / sd)[:, 1]
 
 
+PET_COLUMNS = AMYLOID + TAU + ["has_amyloid", "has_tau", "is_pet_index"]
+
+
+def design_view(df: pd.DataFrame, design: str) -> pd.DataFrame:
+    """'strict': scan on or before the index visit. 'nearest': scan within a
+    year either side (the PET value can be slightly newer than the visit)."""
+    if design == "strict":
+        return df
+    out = df.copy()
+    for c in PET_COLUMNS:
+        out[c] = df[c + "_nearest"]
+    return out
+
+
 def run(df: pd.DataFrame, target: str) -> dict:
     pet = df[df.is_pet_index & df[target].notna()].copy()
     pet["clin_logit"] = logit(clinical_risk(df, target).loc[pet.index])
@@ -100,12 +118,12 @@ def run(df: pd.DataFrame, target: str) -> dict:
 
 def main():
     df = M.load_visits()
-    results = {t: run(df, t) for t in ["y_dementia_2y", "y_dementia_3y"]}
+    results = {design: {t: run(design_view(df, design), t) for t in ["y_dementia_2y", "y_dementia_3y"]} for design in ["strict", "nearest"]}
     text = json.dumps(results, indent=1)
     nu.assert_no_ids(text, "PET results")
     (nu.REPORTS / "phase4_pet_results.json").write_text(text)
-    for t, r in results.items():
-        print(t, r["cohort"])
+    for (design, t), r in {(d, t): r for d, rs in results.items() for t, r in rs.items()}.items():
+        print(design, t, r["cohort"])
         for sub in ["has amyloid PET", "has amyloid and tau PET"]:
             for ev in ["test", "external", "test + external"]:
                 for name, m in r[sub][ev].items():

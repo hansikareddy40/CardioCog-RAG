@@ -1,0 +1,91 @@
+{
+ "passed": 17,
+ "total": 17,
+ "checks": [
+  {
+   "check": "A raw files unmodified",
+   "passed": true,
+   "detail": "10 tables; sizes match the first audit: True; most recent modification 2026-08-11, before any processing began"
+  },
+  {
+   "check": "A PET folders present",
+   "passed": true,
+   "detail": "599 scan folders (599 at the first audit)"
+  },
+  {
+   "check": "B participant in one split only",
+   "passed": true,
+   "detail": "0 participants appear in more than one split"
+  },
+  {
+   "check": "B external centres unseen",
+   "passed": true,
+   "detail": "9 external centres, 37 other centres, 0 shared"
+  },
+  {
+   "check": "B split file matches table",
+   "passed": true,
+   "detail": "saved split file agrees with the modelling table"
+  },
+  {
+   "check": "C no future information at visit 1",
+   "passed": true,
+   "detail": "1500 participants x 67 features compared after deleting later visits; all identical"
+  },
+  {
+   "check": "C no future information at visit 3",
+   "passed": true,
+   "detail": "1500 participants x 67 features compared after deleting later visits; all identical"
+  },
+  {
+   "check": "D label recomputed independently",
+   "passed": true,
+   "detail": "11,403 visits of 3,000 participants; 0 disagreements"
+  },
+  {
+   "check": "D no demented index visits",
+   "passed": true,
+   "detail": "134,943 eligible visits, none with dementia at the visit"
+  },
+  {
+   "check": "E shuffled labels give chance",
+   "passed": true,
+   "detail": "AUROC 0.508 with scrambled labels (0.5 is chance)"
+  },
+  {
+   "check": "F reported AUROC equals recomputed",
+   "passed": true,
+   "detail": "largest difference over 5 models x 2 test sets: 0.00e+00"
+  },
+  {
+   "check": "F cohort sizes in model report",
+   "passed": true,
+   "detail": "{\"train\": {\"n\": 10879, \"events\": 1599}, \"val\": {\"n\": 2241, \"events\": 342}, \"test\": {\"n\": 2286, \"events\": 332}, \"external\": {\"n\": 4064, \"events\": 545}}"
+  },
+  {
+   "check": "G retraining reproduces the result",
+   "passed": true,
+   "detail": "new seed: test 0.937, external 0.946; reported 0.938 and 0.946"
+  },
+  {
+   "check": "G cardiovascular gain is negligible",
+   "passed": true,
+   "detail": "test AUROC gain from the cardiovascular group with a fresh seed: +0.0016"
+  },
+  {
+   "check": "H cohort summary matches table",
+   "passed": true,
+   "detail": "57,038 participants; 19,470 with known status; 2,818 converted"
+  },
+  {
+   "check": "H PET index visits",
+   "passed": true,
+   "detail": "1,653 PET index visits"
+  },
+  {
+   "check": "C PET scan never newer than its index visit",
+   "passed": true,
+   "detail": "1,481 amyloid and 713 tau values; 0 taken after the visit they are used at"
+  }
+ ]
+}

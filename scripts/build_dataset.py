@@ -121,17 +121,21 @@ def add_history(df: pd.DataFrame, raw: pd.DataFrame) -> pd.DataFrame:
 def add_demographics(df: pd.DataFrame) -> pd.DataFrame:
     df["age"] = df["NACCAGE"]
     df["female"] = (df["NACCSEX"] == 2).astype(float).where(df["NACCSEX"].notna())
-    df["educ_years"] = df.groupby("NACCID")["EDUC"].transform("first")
-    race = df.groupby("NACCID")["NACCNIHR"].transform("first")
+    # Fixed characteristics are carried forward from the visit where they were
+    # first recorded. (Taking a person's first non-missing value overall would
+    # copy a value recorded at a later visit back to earlier ones.)
+    df["educ_years"] = df.groupby("NACCID")["EDUC"].ffill()
+    race = df.groupby("NACCID")["NACCNIHR"].ffill()
     for name, code in [("race_white", 1), ("race_black", 2), ("race_asian", 5)]:
         df[name] = (race == code).astype(float).where(race.notna())
-    df["hispanic"] = df.groupby("NACCID")["NACCHISP"].transform("first")
+    df["hispanic"] = df.groupby("NACCID")["NACCHISP"].ffill()
     df["lives_alone"] = (df["NACCLIVS"] == 1).astype(float).where(df["NACCLIVS"].notna())
-    # APOE never changes; "not genotyped" is kept as its own flag instead of being filled in.
+    # APOE never changes and NACC attaches the genotype to every visit; "not
+    # genotyped" is kept as its own flag instead of being filled in.
     e4 = df.groupby("NACCID")["NACCNE4S"].transform("first")
     df["apoe_e4_count"] = e4
     df["apoe_unknown"] = e4.isna().astype(float)
-    df["family_history"] = df.groupby("NACCID")["NACCFAM"].transform("max")
+    df["family_history"] = carry_forward_ever(df["NACCFAM"], df["NACCID"])
     return df
 
 
@@ -258,8 +262,18 @@ def _max_future_within(df: pd.DataFrame, col: str, horizon: float) -> pd.Series:
 # ---------------------------------------------------------------------------
 
 def add_pet(df: pd.DataFrame, train_ids: set) -> pd.DataFrame:
-    """Attach each participant's first PET scan to the nearest eligible visit
-    (within one year). That visit becomes the PET index visit."""
+    """Attach each participant's first PET scan to a clinic visit (the PET index visit).
+
+    Two designs are built, because they trade off differently:
+
+    strict   (main)  the first eligible visit on or after the scan, within one
+             year. A PET value is never newer than the visit it is used at.
+             Clean, but small: recent scans have little follow-up after it.
+    nearest          the eligible visit closest to the scan, within one year
+             either side. Larger, but for most people the scan was taken a few
+             weeks after the visit, so the PET value is slightly newer than
+             the visit. Columns for this design end in "_nearest".
+    """
     amy = nu.first_scan(nu.load_pet_amyloid().query("QC == 1"))
     tau = nu.first_scan(nu.load_pet_tau().query("QC == 1"))
     # Tau SUVR is tracer-specific: scale within tracer against amyloid-negative training participants.
@@ -274,22 +288,25 @@ def add_pet(df: pd.DataFrame, train_ids: set) -> pd.DataFrame:
     (PROCESSED / "tau_norms.json").write_text(json.dumps(tau_norms, indent=1))
     anchor = pd.concat([amy[["NACCID", "SCANDATE"]], tau[["NACCID", "SCANDATE"]]]).groupby("NACCID")["SCANDATE"].min()
     cand = df.loc[df["eligible"], ["NACCID", "VISITDATE"]].join(anchor.rename("anchor"), on="NACCID").dropna()
-    cand["gap"] = (cand["VISITDATE"] - cand["anchor"]).dt.days.abs()
-    pick = cand[cand["gap"] <= PET_WINDOW_DAYS].sort_values("gap").groupby("NACCID").head(1)
-    df["is_pet_index"] = False
-    df.loc[pick.index, "is_pet_index"] = True
+    cand["gap"] = (cand["VISITDATE"] - cand["anchor"]).dt.days          # positive = visit after scan
 
-    def attach(scans, cols, prefix):
-        m = df.loc[pick.index, ["NACCID", "VISITDATE"]].reset_index().merge(scans[["NACCID", "SCANDATE", *cols]], on="NACCID")
-        m["gap"] = (m["SCANDATE"] - m["VISITDATE"]).dt.days
-        m = m[m["gap"].abs() <= PET_WINDOW_DAYS].set_index("index")
-        for c in cols:
-            df.loc[m.index, f"{prefix}_{c.lower()}"] = m[c]
-        df.loc[m.index, f"{prefix}_gap_days"] = m["gap"]
-        df[f"has_{prefix}"] = df.get(f"{prefix}_gap_days", pd.Series(index=df.index, dtype=float)).notna().astype(float)
-
-    attach(amy, ["CENTILOIDS", "AMYLOID_STATUS", "TRACER"], "amyloid")
-    attach(tau, ["META_TEMPORAL_SUVR_z", "CTX_ENTORHINAL_SUVR_z", "TRACER"], "tau")
+    for suffix, visit_ok, scan_ok in [("", cand["gap"].between(0, PET_WINDOW_DAYS), (-PET_WINDOW_DAYS, 0)),
+                                      ("_nearest", cand["gap"].abs() <= PET_WINDOW_DAYS, (-PET_WINDOW_DAYS, PET_WINDOW_DAYS))]:
+        c = cand[visit_ok].assign(dist=lambda d: d["gap"].abs())
+        pick = c.sort_values("dist").groupby("NACCID").head(1)
+        df[f"is_pet_index{suffix}"] = False
+        df.loc[pick.index, f"is_pet_index{suffix}"] = True
+        for scans, cols, prefix in [(amy, ["CENTILOIDS", "AMYLOID_STATUS", "TRACER"], "amyloid"),
+                                    (tau, ["META_TEMPORAL_SUVR_z", "CTX_ENTORHINAL_SUVR_z", "TRACER"], "tau")]:
+            m = df.loc[pick.index, ["NACCID", "VISITDATE"]].reset_index().merge(scans[["NACCID", "SCANDATE", *cols]], on="NACCID")
+            m["gap"] = (m["SCANDATE"] - m["VISITDATE"]).dt.days          # positive = scan after visit
+            m = m[m["gap"].between(*scan_ok)].set_index("index")
+            for col in cols:
+                df[f"{prefix}_{col.lower()}{suffix}"] = np.nan
+                df.loc[m.index, f"{prefix}_{col.lower()}{suffix}"] = m[col]
+            df[f"{prefix}_gap_days{suffix}"] = np.nan
+            df.loc[m.index, f"{prefix}_gap_days{suffix}"] = m["gap"]
+            df[f"has_{prefix}{suffix}"] = df[f"{prefix}_gap_days{suffix}"].notna().astype(float)
     df["has_pet_image"] = df["NACCID"].isin(nu.load_pet_images()["NACCID"]).astype(float)
     return df
 
@@ -333,7 +350,8 @@ def main() -> None:
     }
     cohorts = {"baseline (first visit)": df[(df.NACCVNUM == 1) & df.eligible],
                "longitudinal (third visit)": df[(df.NACCVNUM == 3) & df.eligible],
-               "PET (visit nearest scan)": df[df.is_pet_index]}
+               "PET strict (first visit on or after scan)": df[df.is_pet_index],
+               "PET nearest (visit closest to scan)": df[df.is_pet_index_nearest]}
     table = {}
     for name, c in cohorts.items():
         for target in ["y_dementia_3y", "y_dementia_2y", "y_cdrsb_rise_3y"]:
@@ -348,6 +366,11 @@ def main() -> None:
         "pet_index": {"participants": int(df.is_pet_index.sum()), "with_amyloid": int(df.loc[df.is_pet_index, "has_amyloid"].sum()),
                       "with_tau": int(df.loc[df.is_pet_index, "has_tau"].sum()),
                       "with_image": int(df.loc[df.is_pet_index, "has_pet_image"].sum())},
+        "pet_index_nearest": {"participants": int(df.is_pet_index_nearest.sum()),
+                              "with_amyloid": int(df.loc[df.is_pet_index_nearest, "has_amyloid_nearest"].sum()),
+                              "with_tau": int(df.loc[df.is_pet_index_nearest, "has_tau_nearest"].sum()),
+                              "scan_after_visit_pct": float((df.loc[df.is_pet_index_nearest, "amyloid_gap_days_nearest"] > 0).mean() * 100),
+                              "median_days_scan_after_visit": float(df.loc[df.is_pet_index_nearest, "amyloid_gap_days_nearest"].median())},
         "cog_norm_reference_n": {t: n["n"] for t, n in norms.items()},
     }
     text = json.dumps(summary, indent=1)

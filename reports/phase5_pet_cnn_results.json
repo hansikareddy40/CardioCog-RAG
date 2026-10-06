@@ -1,0 +1,74 @@
+{
+ "n": 292,
+ "positive": 84,
+ "tracers": {
+  "PiB": 128,
+  "Florbetaben": 82,
+  "Florbetapir": 44,
+  "NAV4694": 28,
+  "unknown": 10
+ },
+ "volume_shape": [
+  80,
+  96,
+  80
+ ],
+ "cnn_parameters": 494917,
+ "epochs": 40,
+ "models": {
+  "Cortical SUVR (one number)": {
+   "n": 292,
+   "events": 84,
+   "auroc": 0.981856684981685,
+   "auprc": 0.971501842549929,
+   "auroc_ci": [
+    0.9647946588678801,
+    0.9948236943995753
+   ]
+  },
+  "Regional logistic model": {
+   "n": 292,
+   "events": 84,
+   "auroc": 0.9708676739926739,
+   "auprc": 0.9474645242333015,
+   "auroc_ci": [
+    0.9533305116525913,
+    0.9860310341610973
+   ],
+   "delta_auroc_ci": [
+    -0.026039009940554046,
+    0.004161487712397028
+   ],
+   "delta_auroc": -0.010989010989011061
+  },
+  "3D CNN": {
+   "n": 292,
+   "events": 84,
+   "auroc": 0.9595924908424909,
+   "auprc": 0.93275074305208,
+   "auroc_ci": [
+    0.9356601741306277,
+    0.9814973895167374
+   ],
+   "delta_auroc_ci": [
+    -0.0426034913795356,
+    -0.0030868227299103465
+   ],
+   "delta_auroc": -0.022264194139194116
+  }
+ },
+ "cnn_auroc_by_tracer": {
+  "Florbetapir": 0.96875,
+  "NAV4694": 0.9707602339181287,
+  "PiB": 0.9717849717849718,
+  "Florbetaben": 0.9529824561403509
+ },
+ "grad_cam": {
+  "scans_averaged": 72,
+  "share_of_top5pct_inside_cortical_region": 0.0171875,
+  "share_expected_by_chance": 0.03752115885416667,
+  "mean_cam_inside_cortical_region": 0.18691977191187115,
+  "mean_cam_whole_volume": 0.24263844121440242,
+  "share_of_volume_above_quarter_of_max": 0.9608154296875
+ }
+}
