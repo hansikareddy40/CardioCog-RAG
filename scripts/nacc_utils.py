@@ -321,6 +321,8 @@ def clean(df: pd.DataFrame, columns: list[str] | None = None) -> pd.DataFrame:
         spec = VARIABLES.get(col)
         if spec is None or spec["kind"] in ("id", "date") or col not in out:
             continue
+        if not pd.api.types.is_numeric_dtype(out[col]):   # text columns such as PACKET
+            continue
         s = pd.to_numeric(out[col], errors="coerce")
         out[col] = s.mask(s.isin(spec["missing"]))
     return out

@@ -1,0 +1,210 @@
+{
+ "seed": 2026,
+ "splits_participants": {
+  "train": 31932,
+  "external": 11419,
+  "test": 6845,
+  "val": 6842
+ },
+ "external_centres": 9,
+ "all_centres": 46,
+ "flow_baseline": {
+  "participants": 57038,
+  "first visit in person, UDS v1-3": 55461,
+  "...and not demented": 38107,
+  "...and 3-year status known": 19470,
+  "...of whom converted to dementia": 2818
+ },
+ "cohorts": {
+  "baseline (first visit) | y_dementia_3y": {
+   "train": {
+    "n": 10879,
+    "events": 1599
+   },
+   "val": {
+    "n": 2241,
+    "events": 342
+   },
+   "test": {
+    "n": 2286,
+    "events": 332
+   },
+   "external": {
+    "n": 4064,
+    "events": 545
+   }
+  },
+  "baseline (first visit) | y_dementia_2y": {
+   "train": {
+    "n": 12704,
+    "events": 1063
+   },
+   "val": {
+    "n": 2651,
+    "events": 228
+   },
+   "test": {
+    "n": 2729,
+    "events": 226
+   },
+   "external": {
+    "n": 4827,
+    "events": 358
+   }
+  },
+  "baseline (first visit) | y_cdrsb_rise_3y": {
+   "train": {
+    "n": 11344,
+    "events": 2809
+   },
+   "val": {
+    "n": 2364,
+    "events": 619
+   },
+   "test": {
+    "n": 2375,
+    "events": 572
+   },
+   "external": {
+    "n": 4272,
+    "events": 1035
+   }
+  },
+  "longitudinal (third visit) | y_dementia_3y": {
+   "train": {
+    "n": 5534,
+    "events": 521
+   },
+   "val": {
+    "n": 1140,
+    "events": 106
+   },
+   "test": {
+    "n": 1160,
+    "events": 108
+   },
+   "external": {
+    "n": 2191,
+    "events": 202
+   }
+  },
+  "longitudinal (third visit) | y_dementia_2y": {
+   "train": {
+    "n": 6354,
+    "events": 334
+   },
+   "val": {
+    "n": 1316,
+    "events": 74
+   },
+   "test": {
+    "n": 1311,
+    "events": 79
+   },
+   "external": {
+    "n": 2498,
+    "events": 129
+   }
+  },
+  "longitudinal (third visit) | y_cdrsb_rise_3y": {
+   "train": {
+    "n": 5732,
+    "events": 1129
+   },
+   "val": {
+    "n": 1182,
+    "events": 206
+   },
+   "test": {
+    "n": 1194,
+    "events": 211
+   },
+   "external": {
+    "n": 2294,
+    "events": 469
+   }
+  },
+  "PET (visit nearest scan) | y_dementia_3y": {
+   "train": {
+    "n": 649,
+    "events": 110
+   },
+   "val": {
+    "n": 140,
+    "events": 21
+   },
+   "test": {
+    "n": 133,
+    "events": 23
+   },
+   "external": {
+    "n": 482,
+    "events": 67
+   }
+  },
+  "PET (visit nearest scan) | y_dementia_2y": {
+   "train": {
+    "n": 911,
+    "events": 85
+   },
+   "val": {
+    "n": 200,
+    "events": 11
+   },
+   "test": {
+    "n": 189,
+    "events": 20
+   },
+   "external": {
+    "n": 676,
+    "events": 50
+   }
+  },
+  "PET (visit nearest scan) | y_cdrsb_rise_3y": {
+   "train": {
+    "n": 699,
+    "events": 204
+   },
+   "val": {
+    "n": 142,
+    "events": 35
+   },
+   "test": {
+    "n": 139,
+    "events": 35
+   },
+   "external": {
+    "n": 525,
+    "events": 142
+   }
+  }
+ },
+ "pet_index": {
+  "participants": 3809,
+  "with_amyloid": 3525,
+  "with_tau": 1647,
+  "with_image": 368
+ },
+ "cog_norm_reference_n": {
+  "LOGIMEM": 6531,
+  "MEMUNITS": 6532,
+  "CRAFTVRS": 6218,
+  "CRAFTDVR": 6216,
+  "UDSBENTD": 6180,
+  "DIGIF": 6547,
+  "DIGIB": 6547,
+  "DIGFORCT": 6337,
+  "DIGBACCT": 6337,
+  "TRAILA": 12881,
+  "TRAILB": 12662,
+  "WAIS": 6326,
+  "ANIMALS": 13101,
+  "VEG": 12859,
+  "BOSTON": 6530,
+  "MINTTOTS": 6196,
+  "UDSVERFC": 6280,
+  "UDSBENTC": 6189,
+  "NACCMMSE": 6779,
+  "MOCATOTS": 6270
+ }
+}
