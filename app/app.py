@@ -191,6 +191,38 @@ with right:
         st.caption("A description of change between two visits. In testing, adding past visits changed the risk estimate very little "
                    "once the current scores were known.")
 
+# ---- evidence assistant ----------------------------------------------------
+st.divider()
+st.subheader("Ask the evidence library")
+st.caption("Answers come only from a small library of open-access papers and are shown with their sources. "
+           "This is general published information. It is not advice about this person, and it cannot recommend treatment.")
+
+
+@st.cache_resource
+def load_assistant():
+    import rag
+    return rag.Assistant() if (rag.STORE / "passages.json").exists() else None
+
+
+question = st.text_input("Question", placeholder="For example: Is midlife hypertension associated with later dementia?")
+if question:
+    assistant = load_assistant()
+    if assistant is None:
+        st.info("The evidence library has not been built yet. Run `python scripts/rag_build.py`.")
+    else:
+        top = sorted(res["shap_by_group"].items(), key=lambda kv: -abs(kv[1]))[:2]
+        context = (f"estimated 3-year dementia risk {risk * 100:.0f}%; categories with the largest influence: "
+                   + ", ".join(k for k, _ in top))
+        with st.spinner("Searching the library"):
+            out = assistant.ask(question, model_context=context)
+        st.write(out["answer"])
+        if out["mode"] == "extractive":
+            st.caption("Shown as direct quotations from the sources.")
+        for src in out["sources"]:
+            with st.expander(f"[{src['n']}] {src['short']} ({src['year']}), section: {src['section'] or 'n/a'}"):
+                st.write(src["passage"])
+                st.markdown(f"[{src['title']}]({src['url']})")
+
 st.divider()
 st.caption("How it was tested: AUROC 0.94 on held-out participants and 0.95 on nine held-out research centres (about 0.84 among people "
            "with MCI). Risks were well calibrated internally and slightly high at the held-out centres. Details are in the project reports.")

@@ -1,0 +1,14 @@
+[
+ {"id": "lancet2020", "pmcid": "PMC7392084", "short": "Lancet Commission 2020", "topic": "Risk factors and prevention"},
+ {"id": "niaaa2018", "pmcid": "PMC5958625", "short": "NIA-AA Research Framework 2018", "topic": "Biological definition and staging"},
+ {"id": "aa2024", "pmcid": "PMC11350039", "short": "Alzheimer's Association revised criteria 2024", "topic": "Diagnosis and staging"},
+ {"id": "taupet2019", "pmcid": "PMC6756230", "short": "Tau PET imaging review 2019", "topic": "Tau PET"},
+ {"id": "petreview2019", "pmcid": "PMC6864887", "short": "Amyloid, tau and neuroinflammation PET review 2019", "topic": "PET in AD and MCI"},
+ {"id": "svd2024", "pmcid": "PMC10734789", "short": "Small vessel disease, hypertension and VCID 2024", "topic": "Vascular contributions"},
+ {"id": "htn2020", "pmcid": "PMC7005583", "short": "Hypertension and the risk of dementia 2020", "topic": "Hypertension"},
+ {"id": "bp2026", "pmcid": "PMC12907844", "short": "Cumulative blood pressure and dementia meta-analysis 2026", "topic": "Blood pressure"},
+ {"id": "vrf2024", "pmcid": "PMC11450612", "short": "Vascular risk factors and AD pathology 2024", "topic": "Vascular risk and pathology"},
+ {"id": "diabetes2024", "pmcid": "PMC11092065", "short": "Diabetes and dementia risk meta-analysis 2024", "topic": "Diabetes"},
+ {"id": "mcidiabetes2018", "pmcid": "PMC6208946", "short": "MCI progression with diabetes meta-analysis 2018", "topic": "MCI progression"},
+ {"id": "apoe2018", "pmcid": "PMC6337314", "short": "APOE and TREM2 in Alzheimer's disease 2018", "topic": "APOE"}
+]

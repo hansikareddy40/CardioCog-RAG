@@ -1,0 +1,44 @@
+{
+ "library": {
+  "passages": 447,
+  "sources": 11
+ },
+ "n_questions": {
+  "retrieval": 32,
+  "advice": 8,
+  "general_not_advice": 6,
+  "out_of_scope": 6
+ },
+ "retrieval": {
+  "bm25": {
+   "hit_at_1": 0.96875,
+   "hit_at_3": 1.0,
+   "hit_at_5": 1.0,
+   "mrr": 0.9791666666666667
+  },
+  "dense": {
+   "hit_at_1": 0.875,
+   "hit_at_3": 0.96875,
+   "hit_at_5": 0.96875,
+   "mrr": 0.9270833333333334
+  },
+  "hybrid": {
+   "hit_at_1": 1.0,
+   "hit_at_3": 1.0,
+   "hit_at_5": 1.0,
+   "mrr": 1.0
+  }
+ },
+ "guardrails": {
+  "advice_flagged": 1.0,
+  "general_wrongly_flagged": 0.0,
+  "out_of_scope_refused": 1.0,
+  "in_scope_wrongly_refused": 0.0
+ },
+ "similarity": {
+  "threshold": 0.35,
+  "in_scope_min": 0.48507142066955566,
+  "in_scope_median": 0.731650710105896,
+  "out_of_scope_max": 0.21172526478767395
+ }
+}
