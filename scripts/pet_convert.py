@@ -114,24 +114,31 @@ def main():
     ap.add_argument("--workers", type=int, default=4)
     args = ap.parse_args()
     inv = pd.read_csv(INVENTORY)
+    path = OUT / "conversion_log.csv"
+    done = set(pd.read_csv(path).query("ok").image_id) if path.exists() else set()   # resume after an interruption
     jobs = [{"image_id": r.image_id, "modality": r.folder_modality, "tracer": r.tracer,
              "folder": next(d for d in os.listdir(PET_ROOT / r.folder_modality)
                             if f"_I{r.image_id}_" in d and not d.endswith(".zip"))}
-            for r in inv.itertuples() if not (OUT / r.folder_modality / f"{r.image_id}.nii.gz").exists()]
+            for r in inv.itertuples() if r.image_id not in done]
     jobs = jobs[: args.limit] if args.limit else jobs
     print(f"[convert] {len(jobs)} scans to convert", flush=True)
+    OUT.mkdir(parents=True, exist_ok=True)
     logs = []
+
+    def save():
+        new = pd.DataFrame(logs)
+        if path.exists():
+            new = pd.concat([pd.read_csv(path), new]).drop_duplicates("image_id", keep="last")
+        new.to_csv(path, index=False)
+        return new
+
     with ProcessPoolExecutor(args.workers) as pool:
         for i, log in enumerate(pool.map(convert, jobs), 1):
             logs.append(log)
             if i % 25 == 0 or i == len(jobs):
-                print(f"[convert] {i}/{len(jobs)} done, {sum(l['ok'] for l in logs)} ok", flush=True)
-    path = OUT / "conversion_log.csv"
-    new = pd.DataFrame(logs)
-    if path.exists():
-        new = pd.concat([pd.read_csv(path), new]).drop_duplicates("image_id", keep="last")
-    OUT.mkdir(parents=True, exist_ok=True)
-    new.to_csv(path, index=False)
+                save(); logs.clear()
+                print(f"[convert] {i}/{len(jobs)} done", flush=True)
+    new = pd.read_csv(path)
     print(new.groupby("modality").ok.agg(["size", "sum"]).to_string())
     if "error" in new:
         print(new.error.dropna().str.split(":").str[0].value_counts().to_string())
