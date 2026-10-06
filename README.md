@@ -71,6 +71,22 @@ Available datasets:
 7. Generate SHAP/attention explanations
 8. Build RAG evidence layer for final reporting
 
+## Repository Layout
+
+| Path | Contents |
+|---|---|
+| `docs/project_plan.md` | Phased plan, method choices and the decisions still open |
+| `reports/phase1_eda_summary.md` | Short summary of the data exploration |
+| `reports/variable_map.md` | Every variable used: meaning, category, codes, missing codes, coverage |
+| `reports/data_audit_summary.md` | File-level audit of the raw data |
+| `reports/figures/` | Figures produced by the notebooks |
+| `notebooks/01`-`04` | Exploration notebooks: data catalogue, longitudinal structure and outcomes, feature categories, PET |
+| `scripts/nacc_utils.py` | Shared loading, cleaning and plotting helpers, and the variable map |
+| `scripts/audit_data.py` | Raw-data audit |
+| `data/` | Raw and derived NACC data. Not in the repository (data use agreement) |
+
+To re-run the notebooks, place the NACC files under `data/raw/`, run `python scripts/audit_data.py`, then open the notebooks in order. Reports and notebooks contain aggregate figures only.
+
 ## References
 
 - [NACC Official Site](https://www.naccdata.org/)
