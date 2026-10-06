@@ -265,9 +265,13 @@ def add_pet(df: pd.DataFrame, train_ids: set) -> pd.DataFrame:
     # Tau SUVR is tracer-specific: scale within tracer against amyloid-negative training participants.
     ref = tau.merge(amy[["NACCID", "AMYLOID_STATUS"]], on="NACCID", how="left")
     ref = ref[ref["NACCID"].isin(train_ids) & (ref["AMYLOID_STATUS"] == 0)]
+    tau_norms = {}
     for col in ["META_TEMPORAL_SUVR", "CTX_ENTORHINAL_SUVR"]:
         stats = ref.groupby("TRACER")[col].agg(["mean", "std"])
         tau[col + "_z"] = (tau[col] - tau["TRACER"].map(stats["mean"])) / tau["TRACER"].map(stats["std"])
+        tau_norms[col] = {nu.TRACERS[int(k)]: {"mean": float(v["mean"]), "sd": float(v["std"])} for k, v in stats.iterrows()}
+    PROCESSED.mkdir(parents=True, exist_ok=True)
+    (PROCESSED / "tau_norms.json").write_text(json.dumps(tau_norms, indent=1))
     anchor = pd.concat([amy[["NACCID", "SCANDATE"]], tau[["NACCID", "SCANDATE"]]]).groupby("NACCID")["SCANDATE"].min()
     cand = df.loc[df["eligible"], ["NACCID", "VISITDATE"]].join(anchor.rename("anchor"), on="NACCID").dropna()
     cand["gap"] = (cand["VISITDATE"] - cand["anchor"]).dt.days.abs()

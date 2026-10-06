@@ -51,3 +51,6 @@ venv/
 .idea/
 Thumbs.db
 .DS_Store
+
+# Trained models are derived from NACC data: keep them local
+models/

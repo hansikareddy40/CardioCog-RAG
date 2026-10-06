@@ -76,16 +76,50 @@ Available datasets:
 | Path | Contents |
 |---|---|
 | `docs/project_plan.md` | Phased plan, method choices and the decisions still open |
-| `reports/phase1_eda_summary.md` | Short summary of the data exploration |
+| `reports/phase1_eda_summary.md` | Summary of the data exploration |
+| `reports/phase2_3_results.md` | Summary of cleaning, models and explanations |
 | `reports/variable_map.md` | Every variable used: meaning, category, codes, missing codes, coverage |
-| `reports/data_audit_summary.md` | File-level audit of the raw data |
+| `reports/*.json` | Aggregate results written by the scripts and read by the notebooks |
 | `reports/figures/` | Figures produced by the notebooks |
-| `notebooks/01`-`04` | Exploration notebooks: data catalogue, longitudinal structure and outcomes, feature categories, PET |
-| `scripts/nacc_utils.py` | Shared loading, cleaning and plotting helpers, and the variable map |
-| `scripts/audit_data.py` | Raw-data audit |
-| `data/` | Raw and derived NACC data. Not in the repository (data use agreement) |
+| `notebooks/01`-`04` | Exploration: data catalogue, longitudinal structure and outcomes, feature categories, PET |
+| `notebooks/05` | Cleaning, cohort, target and splits |
+| `notebooks/06` | Tabular models (logistic regression to FT-Transformer), feature groups, longitudinal models |
+| `notebooks/07` | SHAP explanations and their stability |
+| `notebooks/08` | Do amyloid and tau PET measures add to the clinical model? |
+| `notebooks/09` | Validation: subgroups, thresholds, calibration, decision curve, survival check |
+| `notebooks/10` | Missing modalities: modality dropout and late fusion |
+| `scripts/` | Pipeline code (see below) |
+| `app/app.py` | Clinician-facing prototype with a modality checklist |
+| `data/`, `models/` | NACC data and trained models. Not in the repository (data use agreement) |
 
-To re-run the notebooks, place the NACC files under `data/raw/`, run `python scripts/audit_data.py`, then open the notebooks in order. Reports and notebooks contain aggregate figures only.
+## Running the Pipeline
+
+Place the NACC files under `data/raw/`, then:
+
+```
+python scripts/audit_data.py          # file-level audit
+python scripts/build_dataset.py       # cleaning, cohort, labels, splits
+python scripts/train_tabular.py       # five models and the feature-group experiment
+python scripts/train_longitudinal.py  # trajectory features and GRU
+python scripts/explain.py             # SHAP
+python scripts/train_pet.py           # PET measures experiment
+python scripts/validate.py            # validation analyses
+python scripts/train_final.py         # missing-modality model, saved to models/
+streamlit run app/app.py              # interface
+```
+
+Reports and notebooks contain aggregate figures only. The interface is a research prototype and is not for clinical use.
+
+## Main Findings So Far
+
+Dementia within 3 years, among participants not demented at the index visit; all figures on held-out participants.
+
+- AUROC 0.94 on the internal test set and 0.95 on nine held-out centres; about 0.84 among participants with MCI.
+- Logistic regression, random forest, XGBoost, an MLP and an FT-Transformer perform the same.
+- Cardiovascular and medical features add no measurable predictive value once cognition is known (+0.0002 AUROC).
+- Visit history adds very little beyond the current visit (+0.003 to +0.005).
+- Amyloid and tau PET measures did not measurably improve the clinical model over 2 to 3 years.
+- Training with modality dropout keeps predictions calibrated when whole sections of input are missing.
 
 ## References
 
