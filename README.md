@@ -102,7 +102,9 @@ The project started as "cardiovascular risk factors, cognitive trajectories, APO
 | `docs/claims_verification.md` | Every headline number traced to the output that produced it |
 | `rag/` | Evidence sources and test questions |
 | `scripts/` | Pipeline code (see below) |
-| `app/app.py` | Clinician-facing prototype with a modality checklist |
+| `app/web/`, `app/api.py` | Clinician-facing prototype in React with a thin Python API. It asks for exactly the trained features. `app/web/dist` is the built screen; after editing `app/web/src`, run `npm install` and `npm run build` in `app/web` |
+| `app/app.py` | The same prototype in Streamlit (fallback) |
+| `docs/features_by_dataset.md` | Which features come from which table, what was left out, and what the model is trained on |
 | `data/`, `models/` | NACC data and trained models. Not in the repository (data use agreement) |
 
 ## Running the Pipeline
@@ -126,7 +128,9 @@ python scripts/train_pet_image.py     # amyloid image classifier and Grad-CAM (G
 python scripts/rag_build.py           # evidence library
 python scripts/rag_eval.py --llm      # evidence assistant tests
 python scripts/verify_results.py      # 17 independent checks on data, labels and results
-streamlit run app/app.py              # interface
+python scripts/check_clinical_behaviour.py   # 28 checks that the screen's model behaves sensibly
+python -m uvicorn app.api:app --port 8000    # interface (React), then open http://localhost:8000
+streamlit run app/app.py              # the same interface in Streamlit (fallback)
 ```
 
 Reports and notebooks contain aggregate figures only. The interface is a research prototype and is not for clinical use.
