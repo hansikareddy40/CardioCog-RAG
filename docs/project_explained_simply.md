@@ -2,6 +2,8 @@
 
 This note explains everything in the project from the data to the final tool, in plain words. Each part says **what we did**, **why**, and **what we found**. Technical words are explained the first time they appear.
 
+**Status of this note.** Everything written here as "we did" or "we found" was actually run on the NACC data in this repository. On 7 October 2026 every headline number was traced back to the script output that produced it; the table is in `docs/claims_verification.md`. Work that is only planned is listed separately in section 17.
+
 ---
 
 ## 1. What is this project about?
@@ -11,6 +13,8 @@ Some older people slowly lose their memory and thinking ability. When it becomes
 **Our question:** if a person does *not* have dementia today, can a computer look at their health information and estimate the chance that they will have dementia **within the next 3 years**?
 
 We also wanted to know **which kinds of information actually help** to make that estimate, and to build a simple screen that a doctor could use.
+
+**How the question changed.** The project began with a broader idea: use heart and blood-vessel (cardiovascular) information, thinking tests over time, genes and brain scans to predict "cognitive decline". After looking at the data we fixed one precise question, dementia within 3 years, because it has a clear yes/no answer and enough cases. The original cardiovascular idea is still in the project, but as a question we tested: *does cardiovascular information add anything once we know how the person is thinking today?* The answer (section 6) is one of our findings, not the starting assumption.
 
 **One important thing to remember from the start:** this is a research project. It is not a medical product. It cannot diagnose anyone and it does not suggest any medicine.
 
@@ -40,7 +44,7 @@ The data come from **NACC**, a large research programme in the United States. Ab
 | **Heart and blood vessel health** (cardiovascular) | Blood pressure, diabetes, stroke, heart disease, smoking | How healthy the heart and blood vessels are |
 | **Thinking tests** (cognitive) | Memory tests, naming animals in one minute, connecting dots quickly | How well the brain is working right now |
 | **Genes** | APOE | One gene that changes the risk of Alzheimer's |
-| **Brain scans** (PET) | Amyloid and tau scans | Pictures showing harmful proteins that build up in the brain |
+| **Brain scans** (PET) | Amyloid and tau scans | Scans that use a tracer to give information about amyloid or tau build-up in the brain |
 
 There is also a doctor's rating called **CDR**. It scores how much a person's memory and daily life are affected, from 0 (no problem) upward.
 
@@ -84,6 +88,21 @@ And of those 446 people, only **5** later developed dementia. This turned out to
 * People we could not follow for 3 years were left out of this yes/no question, because we simply do not know their answer.
 
 That left **19,470 people**, of whom **2,818** developed dementia within 3 years.
+
+(An earlier count in the exploration notebooks was 19,611 people and 2,833 cases. That was before we removed first visits done by telephone or on the newest form version, which do not have the same tests. 19,470 and 2,818 are the numbers every model uses.)
+
+### Three different groups inside "no dementia today"
+
+"No dementia today" covers people in very different situations, and this matters a lot for how to read the results.
+
+| Group at the first visit | People | Developed dementia within 3 years |
+|---|---|---|
+| **Cognitively normal** (no memory or thinking problem found) | 12,377 | 198 (1.6%) |
+| **Mild cognitive impairment (MCI)** | 5,993 | 2,485 (41.5%) |
+| Impaired, but not classed as MCI | 1,100 | 135 (12.3%) |
+| **All together** | 19,470 | 2,818 (14.5%) |
+
+Almost 9 of every 10 people who developed dementia already had MCI at the start. So "predicting dementia in anyone without dementia" is a much easier question than "predicting dementia in a person who is still cognitively normal". We report all three separately in section 5.
 
 ### A fair test
 
@@ -131,7 +150,39 @@ We used a score called **AUROC**. Imagine picking one person who later got demen
 
 **All five are basically the same.** The fancy modern models did not beat the simple one. On the 9 unseen centres all of them scored about 0.945.
 
-**An honest warning about that 0.94.** Part of it is easy. People who already have mild memory problems convert to dementia far more often (41%) than healthy people (1.6%). Just knowing which group someone is in already helps a lot. When we look only inside the group with mild memory problems, the score is about **0.84**. That is the fairer number.
+### Who exactly is the prediction for? (the most important table in this note)
+
+The 0.94 is for **everyone without dementia mixed together**. Part of it is easy: people with MCI convert far more often (41.5%) than cognitively normal people (1.6%), so just knowing which group someone is in already separates them well. The current diagnosis **on its own**, with nothing else, scores 0.84.
+
+So we report the same model (XGBoost) separately in each group (`scripts/train_by_baseline_group.py`):
+
+| Who | Test group: people / cases | Test score | 9 unseen centres: people / cases | Score there |
+|---|---|---|---|---|
+| All without dementia | 2,286 / 332 | 0.937 | 4,064 / 545 | 0.946 |
+| Cognitively normal only | 1,411 / 24 | 0.884 | 2,624 / 37 | 0.876 |
+| MCI only | 732 / 289 | 0.835 | 1,291 / 496 | 0.846 |
+
+How to read this:
+
+* **Inside the MCI group the score is about 0.84.** This is a fairer number than 0.94, and it is well supported (hundreds of cases).
+* **Inside the cognitively normal group the score is about 0.88, but treat it with care.** It rests on only 24 and 37 cases, so the true value could be anywhere from about 0.82 to 0.94. And because dementia is rare in this group (1.6%), even a good ranking produces many false alarms.
+* Training a separate model only on cognitively normal people, or only on MCI people, gives the same scores (0.88, and 0.83 to 0.84). So the group results are not an accident of mixing the groups during training.
+
+**How much do the doctor's rating (CDR) and the current diagnosis drive the score?**
+
+| Information used | All | Cognitively normal | MCI |
+|---|---|---|---|
+| Current diagnosis only | 0.84 | 0.50 (it is the same for everyone in the group) | 0.50 |
+| CDR rating only | 0.88 | 0.61 | 0.75 |
+| CDR and diagnosis together | 0.90 | 0.61 | 0.75 |
+| Thinking tests only | 0.90 | 0.78 | 0.77 |
+| Everything **except** CDR and diagnosis | 0.92 | 0.87 | 0.81 |
+| Everything **except** CDR, diagnosis and thinking tests | 0.75 | 0.78 | 0.64 |
+| Everything | 0.94 | 0.88 | 0.84 |
+
+(Test group. The 9 unseen centres give the same picture.)
+
+In plain words: most of the 0.94 comes from knowing how the person's brain is doing **today** (CDR, diagnosis and thinking tests). These three overlap, so taking away CDR and diagnosis alone costs only about 0.015 to 0.02, but taking away all three drops the score from 0.94 to 0.75. This is not cheating, because all of it is information from the first visit and the outcome comes later. But it means the model is mostly describing *how far along someone already is*, and it should be described that way.
 
 ---
 
@@ -145,16 +196,23 @@ We removed one kind of information at a time and watched how much the score drop
 | Doctor's rating (CDR) and current diagnosis | A lot |
 | Demographics (mainly age) | Some |
 | Gene (APOE) | A little |
-| Heart and blood vessel health | **Almost nothing** (about 0.001) |
+| Heart and blood vessel health | **Very little** (about 0.001) |
 
-### The main answer to our research question
+### The answer to the cardiovascular question
 
-Once we know how well a person's brain is working today, their heart and blood-vessel records add almost nothing to a 3-year prediction.
+In this group of people and with this way of setting up the prediction, heart and blood-vessel records gave **little extra predictive value** once we already knew how the person's brain is working today (about +0.001 on the score, both in the test group and at the unseen centres).
 
-**Be careful how you say this.** It does **not** mean heart health is unimportant for the brain. It means:
+Three more details:
+
+* On their own, without any thinking information, the cardiovascular records do carry some signal (score 0.63).
+* Added to age, sex, education and APOE only, they gave +0.024 in the test group, but only +0.004 at the unseen centres, so even that is not a stable gain.
+* Inside the cognitively normal group the gain was +0.008 (test) and +0.003 (unseen centres). With so few cases this is too uncertain to call either a benefit or no benefit.
+
+**Be careful how you say this.** We did **not** show that cardiovascular information is useless, and it does **not** mean heart health is unimportant for the brain. The safe sentence is: *"In this NACC cohort and this 3-year prediction setup, cardiovascular features added little beyond current cognitive status."* Reasons it could be different elsewhere:
 
 * The people in this study joined at around age 71. Damage from high blood pressure usually happens in middle age, which we cannot see in this data.
 * Any damage already done is probably already showing up in the thinking-test scores.
+* Most of our cardiovascular items are simple yes/no history answers and one blood-pressure reading per visit. Richer measurements, such as blood pressure tracked over many years, were not available to us.
 
 ---
 
@@ -164,7 +222,17 @@ We asked: if we look at how a person's scores changed over several past visits, 
 
 We tried two ways, including a model called a **GRU** that reads visits in order, like reading a story.
 
-**Result: history adds very little** (about 0.003 to 0.005). The reason makes sense. If someone has been getting worse, today's scores are already low. Knowing *how* they got there adds little once you know *where* they are.
+**Result: in this cohort and setup, adding past visits gave only a small improvement.**
+
+| Method (people with at least 2 earlier visits) | Test group | 9 unseen centres |
+|---|---|---|
+| Today's visit only | 0.919 | 0.953 |
+| + simple "how fast are the scores changing" numbers | 0.922 (+0.003) | 0.956 (+0.003) |
+| GRU reading all the visits in order | 0.920 (+0.000) | 0.958 (+0.005) |
+
+A likely reason: if someone has been getting worse, today's scores are already low. Knowing *how* they got there adds little once you know *where* they are.
+
+**Be careful how you say this too.** This does not show that following people over time is useless. It only shows that for *this* question (dementia within 3 years), with roughly yearly visits and typically 3 earlier visits, the history added little beyond the current visit. A longer time window, an earlier disease stage or more frequent measurements could give a different answer.
 
 ---
 
@@ -190,7 +258,7 @@ So about three quarters of the prediction comes from how the person's brain is d
 
 ## 9. Do brain-scan numbers help? (Notebook 08)
 
-**Amyloid** is a harmful protein that builds up in the brain many years before Alzheimer's symptoms appear. A PET scan can measure it.
+**Amyloid-beta** (amyloid for short) is a protein that can build up into clumps called plaques in the brain. It is one of the main biological markers of Alzheimer's disease, and the build-up can start many years before symptoms. A PET scan estimates it by measuring how much of an injected tracer the brain takes up.
 
 * **On its own, amyloid matters a lot.** Among people with mild memory problems, about 34% of those with amyloid developed dementia within 2 years, compared with about 7% of those without.
 * **But added to everything else, it did not clearly improve the prediction.** The model had already picked up most of that information from the memory tests.
@@ -239,15 +307,17 @@ We did **not** try to predict dementia directly from the images. Only 5 of the 4
 
 In real life, not every patient has had every test.
 
-**The problem:** a normal model breaks badly when a whole section is missing. With no thinking tests at all, its risk numbers became worse than a blind guess.
+**The problem:** a normal model breaks badly when a whole section is missing. With no thinking assessment at all (no thinking tests and no CDR or diagnosis), its risk numbers became worse than a blind guess.
 
 **The fix:** during training, we randomly hid whole sections of information, again and again, so the model practised working with gaps. This is called **modality dropout**.
 
-| Situation: no thinking tests at all | Error (lower is better) |
+| Situation: no thinking tests, no CDR, no diagnosis | Error (lower is better) |
 |---|---|
 | Normal model | 0.44 (very bad) |
 | Our model trained with hidden sections | 0.12 (good) |
 | A model built specially for that case | 0.11 (best possible) |
+
+(For comparison, always guessing the average risk gives an error of 0.12. If only the thinking tests are missing but CDR and diagnosis are still there, the normal model copes fine: 0.08.)
 
 One model now handles any combination of available information. This is one place where an idea from deep learning clearly helped.
 
@@ -257,8 +327,8 @@ One model now handles any combination of available information. This is one plac
 
 A single score is not enough. We also checked:
 
-* **Is it fair across groups?** It worked about equally well for men and women, for different races, and for different education levels.
-* **Where is it weaker?** For people aged 85 and over.
+* **Is it fair across groups?** Scores were similar across sex, race and education groups: between 0.92 and 0.96 in the test group (for example 0.95 for women and 0.92 for men). Some of these groups are small, so small differences should not be over-read.
+* **Where is it weaker?** For people aged 85 and over (0.85 in the test group, 0.89 at the unseen centres), and inside single diagnosis groups (section 5).
 * **Are the risk numbers believable?** When the model said "40% risk", about 40% of those people really did develop dementia. At the 9 unseen centres it guessed slightly too high (15.0% predicted, 13.4% actual).
 * **Does the answer change with a different method?** We repeated the analysis with a method that includes everyone, even people followed for a short time. Same conclusions.
 
@@ -324,15 +394,17 @@ Finding and fixing your own mistakes is a strength. Tell your mentor about it yo
 
 | Question | Answer |
 |---|---|
-| Can we predict dementia within 3 years? | Yes: about 0.94 overall, about 0.84 among people with mild memory problems |
+| Can we predict dementia within 3 years? | About 0.94 for everyone without dementia mixed together; about 0.84 inside the MCI group; about 0.88 inside the cognitively normal group, but based on very few cases |
+| What drives the score? | Mostly how the person's brain is doing today: CDR, current diagnosis and thinking tests. Without those three the score is about 0.75 |
 | Does it work at hospitals it has never seen? | Yes: about 0.95 at 9 unseen centres |
 | Is deep learning better than simple models? | No, they are equal on this kind of data |
-| Does heart and blood-vessel information help? | Almost not at all, once thinking tests are known |
-| Does past history help? | Very little |
+| Does heart and blood-vessel information help? | Little extra value in this cohort and setup, once current thinking status is known (about +0.001) |
+| Does past history help? | Only a small improvement in this cohort and setup (+0.000 to +0.005) |
 | Do brain-scan numbers help? | Not shown, though a small benefit cannot be ruled out |
 | Did our image pipeline work? | Yes: it matches the experts' numbers (0.98) |
 | Is the 3D image model better than one simple number? | No (0.96 against 0.98) |
 | Can the model cope with missing information? | Yes, after training with hidden sections |
+| Did our own checks pass? | 17 of 17, re-run on 7 October 2026 |
 
 ---
 
@@ -343,8 +415,21 @@ Finding and fixing your own mistakes is a strength. Tell your mentor about it yo
 * The volunteers are mostly highly educated and mostly White, with an average age around 71. Results may differ for other groups.
 * About half of the eligible people were not followed long enough to be included.
 * We cannot see people's health in middle age, when heart and blood-vessel problems matter most for the brain.
-* Brain-scan follow-up is short, and very few healthy people in the study developed dementia.
+* Brain-scan follow-up is short, and very few cognitively normal people in the study developed dementia (198 of 12,377). Results for that group are uncertain.
+* The model leans heavily on the doctor's CDR rating and current diagnosis. It is best described as "how likely is progression given the current stage", not as early detection in people with no signs at all.
 * The chatbot's library is small.
+
+### Planned, not done
+
+These were in the original plan or would be natural next steps. **None of them has been run, so none may be reported as a result.**
+
+* Predicting dementia directly from the scan images (not possible with 5 cases; see section 10).
+* A model for cognitively normal people with a longer follow-up window, so that there are more cases to learn from and to test on.
+* Reporting models for other outcomes, such as "thinking scores got clearly worse" instead of a dementia diagnosis. The data table has this outcome ready, but no model results for it are reported.
+* CatBoost, an LSTM, and "attention over visits" explanations, which were named in the first plan. We used XGBoost and a GRU instead, and did not build the attention explanation.
+* MRI. It was never part of this project.
+* The chatbot writing a full report automatically for each prediction. Today the doctor's screen has a question box that searches the library; it answers questions, it does not write a report by itself.
+* Any test with real doctors or real patients.
 
 ---
 
@@ -359,6 +444,8 @@ Finding and fixing your own mistakes is a strength. Tell your mentor about it yo
 | All the code | `scripts/` |
 | The doctor's screen | `app/app.py` |
 | The self-check program | `scripts/verify_results.py` |
+| Every headline number traced to its source | `docs/claims_verification.md` |
+| Results split by cognitively normal / MCI / all | `scripts/train_by_baseline_group.py`, `reports/phase3_by_baseline_group.json` |
 
 ---
 
@@ -371,8 +458,10 @@ Finding and fixing your own mistakes is a strength. Tell your mentor about it yo
 | **Cognitive** | To do with thinking and memory |
 | **Cardiovascular** | To do with the heart and blood vessels |
 | **APOE** | A gene; one version of it raises Alzheimer's risk |
-| **PET scan** | A brain scan that shows where a tracer substance collects |
-| **Amyloid / tau** | Two harmful proteins that build up in the brain in Alzheimer's disease |
+| **PET scan** | A brain scan that measures how much of an injected tracer different brain areas take up. Depending on the tracer, this gives information about amyloid or tau build-up |
+| **Amyloid-beta (amyloid)** | A protein that can build up into plaques in the brain; a major biological marker of Alzheimer's disease |
+| **Tau** | A protein that can form tangles inside brain cells; the second major biological marker of Alzheimer's disease |
+| **Cognitively normal (CN)** | No memory or thinking problem found at the visit |
 | **SUVR** | A number measuring how much tracer signal a brain area has compared with a reference area |
 | **CDR** | A doctor's rating of how much memory and daily life are affected |
 | **Model** | A computer program that learns patterns from examples |

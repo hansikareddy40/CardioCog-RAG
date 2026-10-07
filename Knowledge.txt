@@ -1,6 +1,28 @@
 PROJECT CONTEXT — CARDIOCOG-RAG
 ================================
 
+STATUS NOTE (added 7 October 2026)
+----------------------------------
+This file is the ORIGINAL PLANNING BRIEF, written before any analysis was run.
+It is kept for reference. It does not describe results, and several items below
+are now out of date:
+
+- The target is now fixed: dementia diagnosis within 3 years, among participants
+  not demented at the index visit.
+- The scope moved from "cardiovascular factors to cognitive decline" to this
+  3-year question. Whether cardiovascular information adds predictive value
+  beyond current cognitive status is now a tested question, and its answer
+  (little incremental value in this cohort and setup) is a finding.
+- CatBoost, LSTM/Transformer over visits, temporal attention and a regression
+  head were planned here but not built. XGBoost, an MLP, an FT-Transformer and
+  a GRU were used.
+
+For what was actually done and found, read:
+- docs/project_explained_simply.md   (plain-language account of the whole project)
+- docs/claims_verification.md        (every headline number traced to its source)
+- docs/project_plan.md               (phase-by-phase status)
+
+
 PROJECT TITLE
 -------------
 CardioCog-RAG: Explainable Early Prediction of Cognitive Decline Using Cardiovascular Risk Factors, Longitudinal Cognitive Trajectories, APOE/Genetic Information, and Brain PET Biomarkers.
