@@ -336,16 +336,19 @@ A single score is not enough. We also checked:
 
 ## 13. The doctor's screen (the interface)
 
-We built a simple web page (`app/app.py`).
+We built a simple web page in React (`app/web`, with a small Python program `app/api.py` that runs the model). An older Streamlit version (`app/app.py`) does the same job.
 
-1. The doctor **ticks what information is available** for this patient.
-2. Only those sections ask for input.
-3. The page shows:
+1. The page has one section for each kind of information: about the person, heart and blood vessels, thinking and memory (the doctor's rating, and test scores), genes, and brain scan.
+2. The doctor **marks each section as available or not**. Empty boxes are treated as "not available"; nothing is filled in with a made-up value.
+3. The page asks for **exactly the items the model was trained on** and nothing else (`docs/features_by_dataset.md` lists them).
+4. The page shows:
    * the estimated 3-year risk,
-   * the average for comparison,
+   * next to it, what actually happened to research participants of the same age group and status,
    * which information was used and which was missing,
-   * what pushed the risk up or down,
-   * the change since the previous visit.
+   * what pushed the risk up or down.
+5. **It checks the entries.** If they contradict each other (for example a test score of 0 with status "normal"), it says so before showing the estimate, because the number cannot be trusted then.
+
+We also test the page's behaviour automatically (`scripts/check_clinical_behaviour.py`, 28 checks): a worse rating or test score must never lower the estimate, typical cases must come out in the right order, and contradictions must be flagged. 27 pass. The one that does not: for people under 65 with MCI the model's risk is about 8 points too high on average (35% predicted, 27% observed).
 
 A clear notice says: **research prototype, not for clinical use.**
 
@@ -442,7 +445,9 @@ These were in the original plan or would be natural next steps. **None of them h
 | The full plan and what was done | `docs/project_plan.md` |
 | Short results summaries | `reports/` |
 | All the code | `scripts/` |
-| The doctor's screen | `app/app.py` |
+| The doctor's screen | `app/web` and `app/api.py` (React); `app/app.py` (Streamlit) |
+| Which features come from which table | `docs/features_by_dataset.md` |
+| Checks that the screen behaves sensibly | `scripts/check_clinical_behaviour.py` |
 | The self-check program | `scripts/verify_results.py` |
 | Every headline number traced to its source | `docs/claims_verification.md` |
 | Results split by cognitively normal / MCI / all | `scripts/train_by_baseline_group.py`, `reports/phase3_by_baseline_group.json` |

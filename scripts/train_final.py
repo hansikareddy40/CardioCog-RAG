@@ -39,6 +39,7 @@ MODELS_DIR = nu.REPO / "models"
 OPTIONAL = ["Genetics / APOE", "Cardiovascular / medical", "Cognitive tests", "Clinical stage (CDR-SB, diagnosis)"]
 DROP_PROB = 0.35
 N_COPIES = 4
+AGE_GROUPS = ["Under 65", "65-74", "75-84", "85+"]
 
 # The combinations evaluated: which optional groups are available.
 PATTERNS = {
@@ -130,6 +131,18 @@ def main():
     shutil.copy(M.PROCESSED / "cog_norms.json", MODELS_DIR / "cog_norms.json")
     shutil.copy(M.PROCESSED / "tau_norms.json", MODELS_DIR / "tau_norms.json")
     tr = base[base.split == "train"]
+    # Observed 3-year conversion by age group and diagnosis, and the ranges the
+    # model saw in training. The interface uses these to put an estimate next to
+    # what actually happened to similar participants, and to flag entries that
+    # are rare or contradictory. Aggregates only.
+    age_group = pd.cut(tr["age"], [0, 65, 75, 85, 200], right=False, labels=AGE_GROUPS)
+    by_age_dx = {a: {nu.DX_LABELS[k]: {"n": int(len(g)), "events": int(g[TARGET].sum())} for k, g in ga.groupby("NACCUDSD")}
+                 for a, ga in tr.groupby(age_group, observed=True)}
+    z_cols = [f for f in M.FEATURE_GROUPS["Cognitive tests"] if f.startswith("z_")]
+    ranges = {"age": tr["age"].quantile([0.01, 0.99]).round(0).tolist(), "educ_years": tr["educ_years"].quantile([0.01, 0.99]).round(0).tolist(),
+              "cdrsum_p99_by_dx": {nu.DX_LABELS[k]: float(g["CDRSUM"].quantile(0.99)) for k, g in tr.groupby("NACCUDSD")},
+              "cdrsum_zero_share_by_dx": {nu.DX_LABELS[k]: float((g["CDRSUM"] == 0).mean()) for k, g in tr.groupby("NACCUDSD")},
+              "lowest_z_p01_by_dx": {nu.DX_LABELS[k]: float(g[z_cols].min(axis=1).quantile(0.01)) for k, g in tr.groupby("NACCUDSD")}}
     meta = {
         "target": "dementia diagnosis within 3 years", "features": M.CORE, "feature_groups": M.FEATURE_GROUPS,
         "pet_fusion": {"columns": ["clin_logit"] + cols + [c + "_missing" for c in TAU], "median": med.to_dict(), "mean": mu.tolist(), "sd": sd.tolist(),
@@ -138,7 +151,7 @@ def main():
         "reference": {"event_rate": float(tr[TARGET].mean()),
                       "event_rate_by_dx": {nu.DX_LABELS[k]: float(v) for k, v in tr.groupby("NACCUDSD")[TARGET].mean().items()},
                       "risk_percentiles": np.percentile(avg(dropout, d["train"][0]), np.arange(0, 101, 5)).round(4).tolist(),
-                      "n_train": int(len(tr))},
+                      "n_train": int(len(tr)), "age_groups": AGE_GROUPS, "by_age_group_and_dx": by_age_dx, "ranges": ranges},
     }
     text = json.dumps(meta, indent=1)
     nu.assert_no_ids(text, "model metadata")

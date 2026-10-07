@@ -1,0 +1,236 @@
+{
+ "passed": 27,
+ "total": 28,
+ "checks": [
+  {
+   "check": "A every trained feature has an input",
+   "passed": true,
+   "detail": "48 model features; not covered: none"
+  },
+  {
+   "check": "A no input outside the trained features",
+   "passed": true,
+   "detail": "61 inputs feed 52 features (48 clinical + 4 PET); extra: none"
+  },
+  {
+   "check": "A every trained test can be entered",
+   "passed": true,
+   "detail": "20 tests on screen, 20 in training"
+  },
+  {
+   "check": "B typical cases are ordered normal < impaired < MCI",
+   "passed": true,
+   "detail": "normal 0.6%, impaired, not MCI 4.0%, MCI 60.8%"
+  },
+  {
+   "check": "B typical cognitively normal 72-year-old is low",
+   "passed": true,
+   "detail": "0.6% (0.9% of similar participants converted)"
+  },
+  {
+   "check": "B typical MCI case is high but not certain",
+   "passed": true,
+   "detail": "60.8% (40% of similar participants converted)"
+  },
+  {
+   "check": "B two APOE e4 copies raise the MCI estimate",
+   "passed": true,
+   "detail": "60.8% -> 74.9%"
+  },
+  {
+   "check": "C CDR Sum of Boxes rising never lowers the estimate",
+   "passed": true,
+   "detail": "normal 0.6% -> 4.3%; MCI 22.6% -> 80.5%; largest step down 0.0 points"
+  },
+  {
+   "check": "C status Normal -> Impaired -> MCI never lowers the estimate",
+   "passed": true,
+   "detail": "normal 0.6% -> 1.2%; MCI 38.8% -> 60.8%; largest step down 0.0 points"
+  },
+  {
+   "check": "C MoCA falling never lowers the estimate",
+   "passed": true,
+   "detail": "normal 0.6% -> 1.0%; MCI 47.1% -> 69.6%; largest step down 0.0 points"
+  },
+  {
+   "check": "C MMSE falling never lowers the estimate",
+   "passed": true,
+   "detail": "normal 0.6% -> 1.0%; MCI 47.3% -> 69.6%; largest step down 0.0 points"
+  },
+  {
+   "check": "C delayed story recall falling never lowers the estimate",
+   "passed": true,
+   "detail": "normal 0.4% -> 1.9%; MCI 41.6% -> 69.0%; largest step down 0.0 points"
+  },
+  {
+   "check": "C animal naming falling never lowers the estimate",
+   "passed": true,
+   "detail": "normal 0.4% -> 2.2%; MCI 35.4% -> 64.6%; largest step down 0.0 points"
+  },
+  {
+   "check": "C Trail Making B slower never lowers the estimate",
+   "passed": true,
+   "detail": "normal 0.6% -> 1.6%; MCI 45.3% -> 74.3%; largest step down 0.0 points"
+  },
+  {
+   "check": "C APOE e4 copies rising never lowers the estimate",
+   "passed": true,
+   "detail": "normal 0.6% -> 1.0%; MCI 60.8% -> 74.9%; largest step down 0.0 points"
+  },
+  {
+   "check": "C behavioural symptoms rising never lowers the estimate",
+   "passed": true,
+   "detail": "normal 0.6% -> 1.1%; MCI 60.8% -> 73.8%; largest step down 0.0 points"
+  },
+  {
+   "check": "C older age raises the estimate when adjusted scores are equal",
+   "passed": true,
+   "detail": "MCI case at 55/65/75/85: 58.2%, 58.2%, 64.7%, 70.3%"
+  },
+  {
+   "check": "D ordinary cases raise no warning",
+   "passed": true,
+   "detail": "levels raised: [[], [], []]"
+  },
+  {
+   "check": "D MoCA of 0 with status Normal and CDR 0 is flagged",
+   "passed": true,
+   "detail": "estimate 6% shown with 1 blocking and 3 other warnings"
+  },
+  {
+   "check": "D flagged: status Normal with CDR Sum of Boxes 3",
+   "passed": true,
+   "detail": "blocking warning shown"
+  },
+  {
+   "check": "D flagged: CDR Sum of Boxes 8",
+   "passed": true,
+   "detail": "blocking warning shown"
+  },
+  {
+   "check": "D flagged: systolic below diastolic",
+   "passed": true,
+   "detail": "blocking warning shown"
+  },
+  {
+   "check": "D flagged: 60 years of smoking at age 50",
+   "passed": true,
+   "detail": "blocking warning shown"
+  },
+  {
+   "check": "D noted: age 100",
+   "passed": true,
+   "detail": "note that few participants are like this"
+  },
+  {
+   "check": "E no thinking information is reported, not hidden",
+   "passed": true,
+   "detail": "estimate 11% with the warning that it is only an age-based average; not used: ['Test scores', \"Clinician's assessment\"]"
+  },
+  {
+   "check": "E demographics alone still gives an estimate near the cohort average",
+   "passed": true,
+   "detail": "11% (cohort average 15%)"
+  },
+  {
+   "check": "F cardiovascular items move the estimate only slightly",
+   "passed": true,
+   "detail": "normal: largest single item Bypass surgery +0.1 points; every item ticked +0.1 points; MCI: largest single item Angioplasty or stent +0.4 points; every item ticked +1.3 points (reported, consistent with the +0.001 AUROC finding)"
+  },
+  {
+   "check": "G predicted risk matches what happened, by age group and status",
+   "passed": false,
+   "detail": "11 groups of 50+ held-out participants; largest gap 8.1 points, mean gap 2.6 points"
+  }
+ ],
+ "held_out_by_status_and_age_group": [
+  {
+   "status": "Impaired, not MCI",
+   "age_group": "Under 65",
+   "n": 68,
+   "events": 4,
+   "observed_pct": 5.9,
+   "predicted_pct": 9.3
+  },
+  {
+   "status": "Impaired, not MCI",
+   "age_group": "65-74",
+   "n": 117,
+   "events": 4,
+   "observed_pct": 3.4,
+   "predicted_pct": 6.2
+  },
+  {
+   "status": "Impaired, not MCI",
+   "age_group": "75-84",
+   "n": 91,
+   "events": 17,
+   "observed_pct": 18.7,
+   "predicted_pct": 11.7
+  },
+  {
+   "status": "MCI",
+   "age_group": "Under 65",
+   "n": 349,
+   "events": 94,
+   "observed_pct": 26.9,
+   "predicted_pct": 35.0
+  },
+  {
+   "status": "MCI",
+   "age_group": "65-74",
+   "n": 776,
+   "events": 275,
+   "observed_pct": 35.4,
+   "predicted_pct": 38.5
+  },
+  {
+   "status": "MCI",
+   "age_group": "75-84",
+   "n": 701,
+   "events": 310,
+   "observed_pct": 44.2,
+   "predicted_pct": 44.1
+  },
+  {
+   "status": "MCI",
+   "age_group": "85+",
+   "n": 197,
+   "events": 106,
+   "observed_pct": 53.8,
+   "predicted_pct": 51.3
+  },
+  {
+   "status": "Normal",
+   "age_group": "Under 65",
+   "n": 1117,
+   "events": 4,
+   "observed_pct": 0.4,
+   "predicted_pct": 0.9
+  },
+  {
+   "status": "Normal",
+   "age_group": "65-74",
+   "n": 1533,
+   "events": 11,
+   "observed_pct": 0.7,
+   "predicted_pct": 1.1
+  },
+  {
+   "status": "Normal",
+   "age_group": "75-84",
+   "n": 984,
+   "events": 21,
+   "observed_pct": 2.1,
+   "predicted_pct": 2.3
+  },
+  {
+   "status": "Normal",
+   "age_group": "85+",
+   "n": 401,
+   "events": 25,
+   "observed_pct": 6.2,
+   "predicted_pct": 5.4
+  }
+ ]
+}
