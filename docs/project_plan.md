@@ -8,7 +8,7 @@ This plan follows from the Phase 1 exploration (`reports/phase1_eda_summary.md` 
 |---|---|---|---|
 | 1 Exploration | Done | Data catalogue, variable map, feasibility of each modality | Notebooks 01-04 |
 | 2 Cleaning, cohort, target | Done | Suggested defaults adopted; change the constants in `scripts/build_dataset.py` to revisit | Notebook 05 |
-| 3 Tabular and longitudinal models | Done | All five model types equal (AUROC about 0.94); cardiovascular features and visit history add almost nothing | Notebook 06 |
+| 3 Tabular and longitudinal models | Done | All five model types equal (AUROC about 0.94); cardiovascular features and visit history showed little incremental value in this cohort and setup. Results by baseline diagnosis in `reports/phase3_by_baseline_group.json` | Notebook 06 |
 | 4 PET numbers | Done | No measurable gain over the clinical model at 2 to 3 years | Notebook 08 |
 | 5 PET images | Done for amyloid | Pipeline validated against NACC SUVR (r = 0.98); amyloid-status CNN slightly below the SUVR baseline; Grad-CAM diffuse. Tau image quantification not done (no standard mask) | Notebook 11 |
 | 6 Fusion with missing modalities | Done | Modality dropout on the tabular model plus late fusion for PET. The intermediate-fusion deep network (approach C) was not built: the data gave no reason to expect a gain | Notebook 10 |
@@ -47,7 +47,7 @@ A "no" or "only slightly" to any of these is a valid result.
 | Fact from Phase 1 | Consequence |
 |---|---|
 | 57,038 participants; 39,798 with follow-up | Tabular and longitudinal models are well powered |
-| About 19,600 non-demented people with known 3-year status; about 2,800 convert | Enough for gradient boosting and small neural networks |
+| About 19,600 non-demented people with known 3-year status; about 2,800 convert (19,470 and 2,818 after restricting to in-person UDS v1-3 first visits) | Enough for gradient boosting and small neural networks |
 | Cognitive battery changed in 2015 | Tests must be harmonised before modelling |
 | 5,100 with amyloid PET numbers, 2,724 with tau; about 300 and 150 dementia conversions after the scan | PET enters as a few tabular features; test its value on the PET subset |
 | 446 with PET images; 5 dementia conversions after the scan | No image model for decline. Images get a different, feasible target |

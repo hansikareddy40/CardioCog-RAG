@@ -54,7 +54,7 @@ The deep models match gradient boosting and logistic regression; none is measura
 
 Predicted risks are well calibrated on the test set and slightly high on the external centres (Brier 0.066 against 0.124 for always predicting the base rate).
 
-## Result 2: cardiovascular features add almost nothing once cognition is known
+## Result 2: cardiovascular features showed little incremental value once cognition is known
 
 Gain in AUROC from adding each group to a model that already has all the others (XGBoost, paired bootstrap):
 
@@ -72,7 +72,7 @@ Added to demographics and APOE only (before any cognitive data), the cardiovascu
 
 Stated carefully: in NACC, once current cognition is known, late-life cardiovascular and medical records improved 3-year prediction of dementia by about a tenth of a percentage point of AUROC at most, which is not meaningful. Mid-life exposure is not observed in this cohort, so this is not evidence that vascular health is unrelated to dementia.
 
-## Result 3: history adds very little
+## Result 3: history gave limited incremental improvement in this cohort and setup
 
 | Model | Test AUROC | Gain vs no history | External AUROC | Gain vs no history |
 |---|---|---|---|---|

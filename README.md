@@ -16,7 +16,7 @@ CardioCog-RAG is a machine learning research framework designed to predict cogni
 
 - **Multimodal Integration** — combines structured clinical data with biomarker information
 - **Longitudinal Modeling** — preserves temporal cognitive patterns and trajectories
-- **Explainability** — uses SHAP, temporal attention, and Grad-CAM for feature and decision interpretation
+- **Explainability** — uses SHAP for the tabular models and Grad-CAM for the image classifier
 - **Evidence-Grounded Reporting** — leverages Retrieval-Augmented Generation (RAG) to ground predictions in scientific literature
 
 ## Data Source
@@ -31,20 +31,27 @@ Available datasets:
 
 ## Project Architecture
 
+This section describes what was built. Items from the first plan that were not built are listed at the end of it.
+
 ### Model Pipeline
-1. **Baseline Models** — logistic regression, random forest, XGBoost, CatBoost
-2. **Longitudinal Component** — LSTM/Transformer for cognitive trajectory sequences
-3. **Multimodal Fusion** — combines clinical, cognitive, demographic, genetic, and PET representations
-4. **Prediction Heads** — classification and/or regression for cognitive risk stratification
+1. **Tabular Models** — logistic regression, random forest, XGBoost, an MLP and an FT-Transformer
+2. **Longitudinal Component** — trajectory features and a GRU over the visit sequence
+3. **Missing Modalities** — one tabular model trained with modality dropout, plus late fusion for PET measures
+4. **Prediction Target** — one binary outcome: dementia diagnosis within 3 years, among participants not demented at the index visit
 
 ### Explainability Layer
-- **SHAP** — feature importance and contribution analysis
-- **Temporal Attention** — identify which visits are most informative
-- **Grad-CAM** — regional importance maps for PET imaging (if 3D CNN models are used)
+- **SHAP** — feature and feature-group contributions, with a stability check
+- **Grad-CAM** — for the amyloid-status image classifier (the maps were diffuse and are reported as such)
 
 ### Evidence & Reporting
-- **RAG Pipeline** — retrieves peer-reviewed scientific literature
-- **LLM Summarization** — generates readable, evidence-grounded clinical decision-support reports
+- **RAG Pipeline** — hybrid retrieval over 11 open-access papers, with guardrails
+- **Local language model** — answers from retrieved passages with citations, falling back to direct quotation
+
+### Planned in the first proposal, not built
+CatBoost, an LSTM or Transformer over visits, temporal-attention explanations, a regression head for continuous decline, an image model for decline (only 5 conversions among the 446 participants with images), and automatic per-patient report generation.
+
+### Scope
+The project started as "cardiovascular risk factors, cognitive trajectories, APOE and PET to predict cognitive decline". After the data exploration the question was fixed as dementia within 3 years. Whether cardiovascular information adds predictive value beyond current cognitive status became a question the project tests, and its answer is reported as a finding.
 
 ## Research Questions
 
@@ -91,6 +98,8 @@ Available datasets:
 | `notebooks/11` | PET images: conversion, registration, SUVR check against NACC, amyloid CNN and Grad-CAM |
 | `notebooks/12` | Evidence assistant: retrieval, guardrails, evaluation |
 | `docs/viva_notes.md` | Likely questions with evidence-based answers |
+| `docs/project_explained_simply.md` | Plain-language account of the whole project |
+| `docs/claims_verification.md` | Every headline number traced to the output that produced it |
 | `rag/` | Evidence sources and test questions |
 | `scripts/` | Pipeline code (see below) |
 | `app/app.py` | Clinician-facing prototype with a modality checklist |
@@ -104,6 +113,7 @@ Place the NACC files under `data/raw/`, then:
 python scripts/audit_data.py          # file-level audit
 python scripts/build_dataset.py       # cleaning, cohort, labels, splits
 python scripts/train_tabular.py       # five models and the feature-group experiment
+python scripts/train_by_baseline_group.py  # the same, separately for cognitively normal, MCI and all
 python scripts/train_longitudinal.py  # trajectory features and GRU
 python scripts/explain.py             # SHAP
 python scripts/train_pet.py           # PET measures experiment
@@ -125,10 +135,12 @@ Reports and notebooks contain aggregate figures only. The interface is a researc
 
 Dementia within 3 years, among participants not demented at the index visit; all figures on held-out participants.
 
-- AUROC 0.94 on the internal test set and 0.95 on nine held-out centres; about 0.84 among participants with MCI.
+- All non-demented participants together: AUROC 0.94 on the internal test set and 0.95 on nine held-out centres.
+- By diagnosis at the index visit: about 0.84 within MCI (289 and 496 events); about 0.88 within cognitively normal participants, with wide intervals (24 and 37 events, 1.6% event rate). See `reports/phase3_by_baseline_group.json`.
+- The score is driven mainly by current cognitive status. Diagnosis alone gives 0.84 and CDR-SB with diagnosis 0.90 in the mixed cohort; without CDR-SB, diagnosis and cognitive tests the AUROC is 0.75.
 - Logistic regression, random forest, XGBoost, an MLP and an FT-Transformer perform the same.
-- Cardiovascular and medical features add almost nothing once cognition is known (about +0.001 AUROC).
-- Visit history adds very little beyond the current visit (+0.003 to +0.005).
+- Cardiovascular and medical features showed little incremental value in this cohort and setup once current cognition is known (about +0.001 AUROC). This is not evidence that vascular health is unrelated to dementia.
+- Visit history gave limited incremental improvement over the current visit in this cohort and setup (+0.000 to +0.005).
 - Amyloid and tau PET measures did not demonstrably improve the clinical model over 2 to 3 years, under two ways of matching scans to visits.
 - A PET-only image pipeline built from raw DICOM reproduces the PET core's amyloid SUVR (correlation 0.98 over 318 scans). A 3D CNN classifies amyloid status at AUROC 0.96, below the single SUVR measurement (0.98).
 - Training with modality dropout keeps predictions calibrated when whole sections of input are missing.

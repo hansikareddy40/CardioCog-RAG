@@ -26,15 +26,19 @@ We used the NACC Uniform Data Set (57,038 participants, 217,598 visits) to predi
 
 ## Models
 
-**Which model is best?** None is measurably better. Logistic regression 0.936, random forest 0.932, XGBoost 0.938, MLP 0.939, FT-Transformer 0.939 (test AUROC), with overlapping intervals; about 0.945 on the held-out centres. (Notebook 06)
+**Which model is best?** None is measurably better. Logistic regression 0.936, random forest 0.932, XGBoost 0.938, MLP 0.938, FT-Transformer 0.939 (test AUROC), with overlapping intervals; about 0.945 on the held-out centres. (Notebook 06)
 
 **Then why include deep learning?** To test it fairly. Published benchmarks find the same on tabular data of this size. The deep-learning idea that did help was modality dropout. (Notebooks 06, 10)
 
-**Is 0.94 realistic?** It is inflated by mixing cognitively normal people (1.6% convert) with people who have MCI (41% convert). Within MCI the AUROC is about 0.84, which is the fairer figure. (Notebook 06, section 1.1)
+**Is 0.94 realistic?** It is for all non-demented participants together, and it is inflated by mixing cognitively normal people (1.6% convert) with people who have MCI (41.5% convert); diagnosis alone gives 0.84. Within MCI the AUROC is about 0.84 (289 test events), which is the fairer figure. Within cognitively normal participants it is about 0.88, but on 24 test and 37 external events (interval about 0.82 to 0.94) and at a 1.6% event rate, so it must be quoted with that caveat. (`reports/phase3_by_baseline_group.json`)
 
-**Do cardiovascular features help?** Almost not at all once cognition is known: about +0.001 AUROC (test-set interval includes zero); the same in the survival analysis. Limits: NACC enrols at a median age of 71, so mid-life exposure is not observed, and vascular damage may already show up in the cognitive scores. This is not evidence that vascular health is unrelated to dementia. (Notebooks 06, 09)
+**Who is the target population?** Participants without dementia at their first visit: 12,377 cognitively normal (198 events), 5,993 with MCI (2,485 events), 1,100 impaired but not MCI (135 events). Results are reported for all three.
 
-**Does longitudinal history help?** Very little (+0.003 to +0.005 AUROC), with engineered slopes or a GRU. The current visit already reflects past decline. (Notebook 06, section 3)
+**Doesn't CDR and current diagnosis give the answer away?** They are measured at the index visit and the outcome is later, so it is not leakage, but they do carry most of the signal together with the cognitive tests. CDR-SB with diagnosis alone gives 0.90 in the mixed cohort (0.61 within normal, 0.75 within MCI). Removing them from the full model costs 0.015 to 0.02 overall and about 0.03 within MCI; removing them and the cognitive tests drops the AUROC from 0.94 to 0.75. The model is best described as estimating progression given current stage. (Notebook 06, section 1.1)
+
+**Do cardiovascular features help?** They showed little incremental value in this cohort and setup once cognition is known: about +0.001 AUROC (test-set interval includes zero); the same in the survival analysis. Limits: NACC enrols at a median age of 71, so mid-life exposure is not observed, and vascular damage may already show up in the cognitive scores. This is not evidence that vascular health is unrelated to dementia. (Notebooks 06, 09)
+
+**Does longitudinal history help?** In this cohort and setup it gave limited incremental improvement: +0.003 with engineered slopes on both test sets; with a GRU +0.000 on the test set and +0.005 on the held-out centres. The current visit already reflects past decline. This does not show that longitudinal modelling is useless; a longer horizon or an earlier disease stage could differ. (Notebook 06, section 3)
 
 **Does PET help?** No gain was demonstrated over 2 to 3 years, under two designs: a strict one where the scan is on or before the index visit (clean, about 30 events, wide intervals) and a larger one using the nearest visit (tight intervals around zero, but the scan often falls shortly after the visit). On its own amyloid is a strong marker (about 34% versus 7% conversion within 2 years among people with MCI), but the clinical model has already captured most of that through memory scores and CDR-SB. A gain of 0.02 to 0.03 AUROC cannot be ruled out, and cognitively normal people cannot be assessed (0 or 1 conversion). (Notebook 08)
 
@@ -95,6 +99,8 @@ We used the NACC Uniform Data Set (57,038 participants, 217,598 visits) to predi
 | Test AUROC, XGBoost | 0.938 (0.925-0.948) |
 | External-centre AUROC | 0.946 (0.938-0.954) |
 | AUROC within MCI | about 0.84 |
+| AUROC within cognitively normal | about 0.88 (24 test events; interval 0.82-0.94) |
+| Cohort by baseline diagnosis | 12,377 normal / 5,993 MCI / 1,100 impaired-not-MCI |
 | Gain from cardiovascular group | about +0.001 |
 | Calibration, external | predicted 15.0%, observed 13.4% |
 | PET image scans processed | 599 |
