@@ -21,7 +21,7 @@ Checked against the code on 7 October 2026 (`scripts/nacc_utils.py`, `scripts/bu
 | `scan_clariti_amyloidpetnpdka` | 3,933 scans | Amyloid PET by brain region (about 160 regional SUVR values per scan) | Audited only. No script reads it for modelling: its SUVR values are tracer-specific and cannot be pooled, so the Centiloid table above is used instead |
 | `scan_mp_amyloidpetnpdka` | 2,235 scans | The same for older scans | Same |
 | `scan_clariti_fdgpetnpdka` | 885 scans | FDG PET (brain energy use) | Explored only. Too few people (600) |
-| `scan_clariti_petqc` | 8,759 images | Image list: tracer, scanner, pass/fail | Quality filter (pass only) and linking the 599 image folders |
+| `scan_clariti_petqc` | 8,759 images | Image list: tracer, scanner, pass/fail | Data audit only: confirmed that all 599 local image folders are in this list and passed quality control. Not a model input. (The quality filter on PET numbers uses the QC column inside the amyloid and tau tables) |
 | `clariti_edc` | 857 rows | Study tracking dates | Not a feature source |
 
 The 599 raw PET image folders were used for the separate image experiment (notebook 11). No image feature goes into the dementia model, because only 5 of the 446 people with images developed dementia.
