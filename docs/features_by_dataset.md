@@ -14,11 +14,11 @@ Checked against the code on 7 October 2026 (`scripts/nacc_utils.py`, `scripts/bu
 | Table | Rows | What it holds | Used for |
 |---|---|---|---|
 | `investigator_ftldlbd_nacc74.csv` (main clinical table) | 217,598 visits, 57,038 people | Demographics, medical history, blood pressure, medication, thinking tests, CDR, diagnosis, APOE | **All 48 model features and the outcome** |
-| `scan_clariti_amyloidpetgaain` | 3,933 scans | Amyloid PET summary: Centiloids, amyloid status | **PET numbers** (Centiloids, status) |
+| `scan_clariti_amyloidpetgaain` | 3,933 scans | Amyloid PET summary: Centiloids, amyloid status, summary SUVR | **PET numbers** (Centiloids, status). Its summary SUVR is also what our own image SUVR was checked against (notebook 11) |
 | `scan_mp_amyloidpetgaain` | 2,235 scans | The same for older scans | **PET numbers** |
 | `scan_clariti_taupetnpdka` | 2,653 scans | Tau PET: about 170 regional values | **PET numbers** (2 regions only) |
 | `scan_mp_taupetnpdka` | 671 scans | The same for older scans | **PET numbers** (2 regions only) |
-| `scan_clariti_amyloidpetnpdka` | 3,933 scans | Amyloid PET by brain region (about 170 values) | Only to check our own image SUVR (notebook 11). Not a model input |
+| `scan_clariti_amyloidpetnpdka` | 3,933 scans | Amyloid PET by brain region (about 160 regional SUVR values per scan) | Audited only. No script reads it for modelling: its SUVR values are tracer-specific and cannot be pooled, so the Centiloid table above is used instead |
 | `scan_mp_amyloidpetnpdka` | 2,235 scans | The same for older scans | Same |
 | `scan_clariti_fdgpetnpdka` | 885 scans | FDG PET (brain energy use) | Explored only. Too few people (600) |
 | `scan_clariti_petqc` | 8,759 images | Image list: tracer, scanner, pass/fail | Quality filter (pass only) and linking the 599 image folders |
