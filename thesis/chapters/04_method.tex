@@ -1,0 +1,139 @@
+\chapter{Methodology}
+\label{ch:method}
+
+\section{Prediction task}
+
+The prediction is made at an \emph{index visit}, using only information available at or before that visit. For a participant without dementia at the index visit, the task is to estimate the probability of a clinical diagnosis of dementia within three years:
+\begin{equation}
+\hat{p} = P\left(\text{dementia diagnosed in } (t_0, t_0 + 3\ \text{years}] \mid \mathbf{x}_{t_0}\right),
+\end{equation}
+where $t_0$ is the date of the index visit and $\mathbf{x}_{t_0}$ the feature vector at that visit. The main analysis uses each participant's first visit as the index visit.
+
+\subsection{Choice of horizon and outcome}
+
+Clinical diagnosis (\texttt{NACCUDSD}) and the Clinical Dementia Rating are recorded at every visit in every form version, which makes them the most consistent outcomes available. A dementia diagnosis was chosen as the main outcome because it is clinically meaningful and easy to interpret. The three-year horizon balances the number of events against loss to follow-up: Kaplan--Meier estimates show that about 35\% of participants with MCI progress to dementia within three years, and that 11\% of cognitively normal participants progress to MCI or dementia, while the number of participants with a known status falls steadily with longer horizons and most PET scans are too recent for a five-year horizon.
+
+\subsection{Censoring}
+
+A participant last seen less than three years after the index visit without a dementia diagnosis has an unknown outcome. Such participants were excluded from the binary task rather than counted as negative, which would bias the estimated risk downwards. Because this exclusion could itself introduce bias, a Cox proportional hazards model that uses all eligible participants, including the censored ones, was fitted as a robustness check (Section~\ref{sec:res_sens}).
+
+\section{Cohort}
+
+Table~\ref{tab:flow} shows how the cohort was formed. Visits had to be in person and on form versions 1 to 3, because telephone and version~4 visits lack the neuropsychological tests. Participants with dementia at the index visit, or at any earlier visit, are not eligible.
+
+\begin{table}[H]
+\centering\small
+\caption{Cohort flow.}
+\label{tab:flow}
+\begin{tabular}{@{}lr@{}}
+\toprule
+Step & Participants \\
+\midrule
+All participants & 57,038 \\
+First visit in person, form version 1 to 3 & 55,461 \\
+\quad and not demented at that visit & 38,107 \\
+\quad and outcome known at three years & 19,470 \\
+\quad\quad of whom diagnosed with dementia within three years & 2,818 (14.5\%) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The ``not demented'' cohort contains three clinically different groups: 12,377 cognitively normal participants (198 converters, 1.6\%), 5,993 participants with MCI (2,485 converters, 41.5\%) and 1,100 participants classed as impaired but not MCI (135 converters, 12.3\%). Results are reported for the whole cohort and for the normal and MCI groups separately.
+
+\section{Feature construction}
+
+\subsection{Harmonised cognitive scores}
+
+To place tests from different form versions on one scale, each raw score $s$ was converted into a demographically adjusted $z$-score. For each test, a linear model of the score on age, sex and education was fitted among cognitively normal participants at their first visit, using the training set only:
+\begin{equation}
+\hat{s} = \beta_0 + \beta_1\,\text{age} + \beta_2\,\text{female} + \beta_3\,\text{education},
+\qquad
+z = \frac{s - \hat{s}}{\sigma_{\text{res}}},
+\end{equation}
+where $\sigma_{\text{res}}$ is the residual standard deviation of the fitted model. The sign is reversed for the two timed Trail Making tests, so that a negative $z$ always means worse than expected. Values were clipped to $[-5, 5]$. The $z$-scores of the tests in one cognitive domain were then averaged to give six domain scores: global screening (MoCA, MMSE), memory, attention, speed and executive function, language, and visuospatial function. A participant receives a domain score from whichever tests their visit contained.
+
+As an example, for the MoCA the fitted model is $\hat{s} = 23.0 - 0.059\,\text{age} + 0.33\,\text{female} + 0.42\,\text{education}$ with $\sigma_{\text{res}} = 2.56$, estimated from 6,264 normal participants. A 72-year-old woman with 16 years of education has an expected score of 25.8, so a score of 21 corresponds to $z = -1.9$.
+
+Three further cognitive features were derived: the number of tests the participant could not complete for cognitive or behavioural reasons (NACC code 96 or 996), which is informative about severity and is therefore kept rather than treated as missing; the Geriatric Depression Scale total; and the number of NPI-Q behavioural symptoms present.
+
+\subsection{Cardiovascular history}
+
+Each condition was coded as ``ever present'' from the participant-reported history (form A5, where both recent and remote mentions count) and, where that form was blank, from the clinician-assessed form D2. Once present, a condition remains present at all later visits. Measured blood pressure, heart rate and BMI use the most recent measurement up to the visit. Pulse pressure and a count of four vascular risk factors (hypertension, hypercholesterolaemia, diabetes and smoking) were derived.
+
+\subsection{Genetics}
+
+The number of APOE $\varepsilon$4 alleles is used directly. About one participant in five was not genotyped; genotyping depends on centre and consent and is therefore not random, so these participants receive a separate ``not genotyped'' indicator instead of an imputed value.
+
+\subsection{Preventing the use of future information}
+\label{sec:pettiming}
+
+No feature at a visit may depend on a later visit. Fixed characteristics such as education are carried forward from the visit where they were first recorded, never backwards. A PET scan is used at a visit only if it was acquired on or up to 365 days before that visit. Both rules were introduced after the verification step described in Chapter~\ref{ch:verification} found violations in an earlier version of the pipeline.
+
+\section{Data splits}
+
+All splits were made at participant level, so that all visits of a person fall in the same partition. Twenty percent of the centres (9 of 46) were held out entirely to measure performance at sites the model has never seen. The remaining participants were divided into training (70\%), validation (15\%) and test (15\%) sets, stratified by diagnosis at the first visit. The random seed was fixed (2026). Table~\ref{tab:splits} gives the resulting sizes for the first-visit cohort.
+
+\begin{table}[H]
+\centering\small
+\caption{Partition sizes for the main cohort.}
+\label{tab:splits}
+\begin{tabular}{@{}lrr@{}}
+\toprule
+Partition & Participants & Converters \\
+\midrule
+Training & 10,879 & 1,599 \\
+Validation & 2,241 & 342 \\
+Test & 2,286 & 332 \\
+Held-out centres & 4,064 & 545 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Every quantity estimated from data (normative models for $z$-scores, tau standardisation, imputation medians, scaling) was fitted on the training set and applied unchanged to the other sets. The validation set was used for early stopping and model selection; the test set and the held-out centres were used only for evaluation.
+
+\section{Models}
+
+Five classifiers of increasing complexity were compared on the same 48 features (Table~\ref{tab:models}). Logistic regression is the standard baseline in clinical prediction. Random forests \cite{breiman2001} and gradient-boosted trees (XGBoost \cite{chen2016}) are strong learners for tabular data that handle non-linear effects and interactions. A multilayer perceptron and the FT-Transformer \cite{gorishniy2021} represent deep learning; the latter tokenises each feature and applies self-attention, and is among the strongest deep architectures reported for tabular data. Except for logistic regression, every model was trained with three random seeds and the predictions were averaged.
+
+\begin{table}[H]
+\centering\small
+\caption{Models and settings.}
+\label{tab:models}
+\begin{tabularx}{\textwidth}{@{}lY@{}}
+\toprule
+Model & Settings \\
+\midrule
+Logistic regression & Median imputation with missing-value indicators, standardisation; regularisation strength chosen from five values on the validation set \\
+Random forest & 500 trees, minimum 10 samples per leaf, $\sqrt{p}$ features per split \\
+XGBoost & Up to 3,000 trees, learning rate 0.03, depth chosen from \{3, 4, 6\} on validation AUROC, subsample and column sample 0.8, early stopping after 100 rounds without improvement; missing values handled natively \\
+Multilayer perceptron & Two hidden layers (128 and 64 units), dropout 0.2, AdamW, early stopping on validation AUROC \\
+FT-Transformer & Feature tokens of dimension 64, three Transformer layers with eight heads, a learned token for each missing feature, early stopping on validation AUROC \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+XGBoost was used as the main model for all further experiments because it performed as well as the others, handles missing values without imputation and allows exact Shapley value explanations.
+
+\section{Contribution of each feature category}
+
+The contribution of a category was measured by ablation: the model was trained with all categories and again without the category of interest, and the paired difference in AUROC on the same participants was computed with bootstrap confidence intervals. Each category was also evaluated alone and in cumulative order.
+
+\section{Longitudinal models}
+
+To test whether earlier visits add information, the index visit was moved to a later ``landmark'' visit preceded by at least two earlier visits. Three models were compared on the same landmarks: XGBoost on the landmark visit only; XGBoost with slope and change features of the cognitive scores and CDR-SB over the earlier visits; and a gated recurrent unit (GRU) \cite{cho2014} with 48 hidden units that reads up to six visits, with the time of each visit as an input because visit intervals are irregular.
+
+\section{PET late fusion}
+
+Because few scanned participants have three years of follow-up, a large model cannot be fitted on PET participants alone. A late-fusion design was used: the clinical model, trained on all participants, produces a risk for each scanned participant; a small, strongly regularised logistic regression then combines the logit of that risk with the PET measures and indicators of which measures are present. Two rules for matching scans to visits were compared: a strict rule (scan on or before the index visit) and a nearest-visit rule (larger, but the scan may follow the visit by a few weeks).
+
+\section{Modality dropout}
+
+In practice not every patient has every assessment. A model trained on complete records may behave poorly when an entire category is missing. To make one model usable with any combination of available information, the training data were augmented with four additional copies in which each optional category (genetics, cardiovascular, cognitive tests, clinical stage) was removed independently with probability 0.35. This model was compared with a standard model and with specialist models retrained for each pattern of missing categories.
+
+\section{Explainability}
+
+Predictions were explained with Shapley additive explanations (SHAP) \cite{lundberg2017}, computed exactly for the tree ensemble with TreeSHAP \cite{lundberg2020}. For each test participant, SHAP decomposes the predicted log-odds into a sum of feature contributions. Global importance is the mean absolute contribution of a feature over the test set; category importance is the sum over its features. Stability was assessed by refitting the model on eight bootstrap samples of the training set.
+
+\section{Evaluation}
+
+Discrimination was measured by the area under the ROC curve (AUROC) and the area under the precision--recall curve (AUPRC). Calibration was assessed by the Brier score, calibration slope and intercept, and by comparing predicted and observed risk in deciles. Clinical usefulness was assessed by decision curve analysis \cite{vickers2006} and by sensitivity, specificity and predictive values at fixed risk thresholds. Uncertainty was quantified by 1,000 bootstrap resamples of the evaluation set; differences between models were computed on the same resamples (paired bootstrap). Performance was examined within subgroups defined by sex, age, race, education, APOE status and baseline diagnosis.

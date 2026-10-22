@@ -1,0 +1,74 @@
+\chapter{PET Image Pipeline}
+\label{ch:petimages}
+
+This chapter describes a separate experiment on the 599 raw PET acquisitions. Its purpose is to establish whether the images can be processed into reliable quantitative measurements and used by an image model. It does not feed the dementia model, for the reason given in Section~\ref{sec:why_not_images}.
+
+\section{From DICOM series to static volumes}
+
+Each acquisition arrives as a dynamic DICOM series of between 188 and 4,134 files: the same volume repeated over several time frames, from about 20 scanner models. For every scan the stored values were converted to activity concentration, slices were grouped into frames and ordered spatially, and the frames whose mid-point fell inside the tracer's standard static acquisition window were averaged, each weighted by its duration. The result is one static three-dimensional volume per scan. The raw files were only read; all outputs were written to a separate directory.
+
+\section{Spatial registration}
+
+Scans differ in matrix size, voxel spacing and head position, so the same voxel does not correspond to the same anatomical location across scans. No structural MRI was available, so a PET-only registration in two passes was used. In the first pass each scan was aligned to the MNI152 T1 template with a rigid transform (rotation and translation), using mutual information as the similarity measure because PET and T1 images have different contrast. The aligned scans of each tracer class were averaged to form a study-specific PET template, and in the second pass each scan was aligned to that template with a full affine transform (12 parameters). Aligning PET to a PET template is more robust than aligning it to an MRI template.
+
+\section{Amyloid SUVR from the images}
+
+For each registered amyloid scan, the standardised uptake value ratio was computed as the mean uptake in the cortical target region divided by the mean uptake in the whole cerebellum, using the standard masks of the Centiloid project \cite{klunk2015}. NACC's PET core had computed an SUVR for the same scans with a different, MRI-based pipeline in native space. Agreement between the two therefore provides an independent test of the conversion and registration steps.
+
+\begin{table}[H]
+\centering\small
+\caption{Agreement between image-derived and NACC amyloid SUVR (318 scans).}
+\label{tab:suvr}
+\begin{tabular}{@{}lr@{}}
+\toprule
+Measure & Value \\
+\midrule
+Pearson correlation & 0.977 \\
+Spearman correlation & 0.885 \\
+Regression slope (NACC on ours) & 1.10 \\
+Mean difference (ours minus NACC) & $-0.043$ \\
+95\% limits of agreement & $-0.18$ to $+0.09$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Agreement was high for every tracer (Pearson $r$ between 0.96 and 0.99 for the four tracers with known identity) and every scanner manufacturer. The lower Spearman correlation reflects the many amyloid-negative scans with similar low values, where small differences change the rank order.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{11_suvr_agreement.png}
+\caption{Image-derived amyloid SUVR against the value computed by the NACC PET core for the same scans.}
+\label{fig:suvr}
+\end{figure}
+
+\section{Amyloid status classification}
+
+Three classifiers of amyloid status were compared on the 292 amyloid scans with a status label from the PET core (84 positive), using five-fold stratified cross-validation so that every scan was predicted by a model that had not seen it: (i) the cortical SUVR alone; (ii) a logistic regression on mean uptake in an $8 \times 8 \times 8$-voxel grid of blocks; and (iii) a small 3D convolutional neural network. The network has four stages of two $3 \times 3 \times 3$ convolutions with instance normalisation and ReLU, each stage halving the resolution, followed by global average pooling, dropout of 0.3 and a linear output, with 494,917 weights in total. Volumes were cropped to the head and resampled to $80 \times 96 \times 80$ voxels. Training used AdamW (learning rate $10^{-3}$, weight decay $10^{-2}$) with a one-cycle schedule, 40 epochs, batches of 8, a class-weighted loss, and augmentation by left--right flips, shifts of up to three voxels and small intensity changes.
+
+\begin{table}[H]
+\centering\small
+\caption{Amyloid status classification (292 scans, 84 positive, cross-validated).}
+\label{tab:cnn}
+\begin{tabular}{@{}lr@{}}
+\toprule
+Method & AUROC \\
+\midrule
+Cortical SUVR (one number) & 0.982 \\
+Regional logistic model & 0.971 \\
+3D CNN & 0.960 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The single SUVR value performed best. This is expected: the reference label is itself derived by the PET core from a cortical uptake measure, so a scalar SUVR is close to the definition of the label, and a network trained on fewer than 300 scans has little opportunity to improve on it. The experiment shows that the image pipeline supports a working deep-learning model, not that a CNN is preferable for this task.
+
+\section{Grad-CAM}
+
+Gradient-weighted class activation maps \cite{selvaraju2017} were computed for the network and averaged over 72 scans. The maps were diffuse: about 96\% of the volume exceeded a quarter of the maximum activation, and only 1.7\% of the most strongly activated voxels lay inside the cortical target region, against 3.8\% expected by chance. The maps therefore do not show that the network attends to the cortical regions where amyloid accumulates, and they are not used as evidence of what the model has learned.
+
+\section{Why images are not used to predict dementia}
+\label{sec:why_not_images}
+
+Of the 446 participants with an image, about 86\% were cognitively normal at the time of the scan, follow-up after the scan is about two years, and only five later received a dementia diagnosis. No model can learn a reliable pattern from five events, so dementia prediction from images was not attempted. The quantitative PET information that is available for thousands of participants is used instead, through the late-fusion model described in Chapter~\ref{ch:method}.
+
+Two further limitations apply. Registration without an MRI is less precise than the MRI-based pipelines used by PET cores. Tau images were converted and registered but not quantified, because a standard tau target mask comparable to the Centiloid masks was not available.

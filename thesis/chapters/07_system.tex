@@ -1,0 +1,62 @@
+\chapter{System Design}
+\label{ch:system}
+
+The models are packaged as a research prototype for a clinician: an interface for entering a patient's information and seeing a risk estimate with its explanation, and an evidence assistant that answers questions from a fixed library of published papers. The prototype is not intended for clinical use and states this on every screen.
+
+\section{Architecture}
+
+\begin{table}[H]
+\centering\small
+\caption{Components of the prototype.}
+\label{tab:components}
+\begin{tabularx}{\textwidth}{@{}lY@{}}
+\toprule
+Component & Role \\
+\midrule
+Inference module (\texttt{scripts/inference.py}) & Converts raw entries into the 48 model features (for example a MoCA score into the global $z$-score), runs the modality-dropout model and the PET fusion model, computes SHAP values and checks the plausibility of the entries \\
+API (\texttt{app/api.py}, FastAPI) & Serves the form definition, predictions and evidence-assistant answers \\
+Interface (\texttt{app/web}, React) & The form and the results \\
+Evidence assistant (\texttt{scripts/rag.py}) & Retrieval, guardrails and answer generation \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Input form}
+
+The form is generated from the list of features the model was trained on, so it asks for exactly those inputs and nothing else. It has one section per category: demographics (required), cardiovascular history and measurements, the clinician's assessment (cognitive status and CDR-SB), test scores, genetics, and PET. The clinician marks each optional section as available or not. Empty fields are passed to the model as missing values; no default values are substituted. For each test the form shows the expected score of a healthy person of the same age, sex and education.
+
+\section{Output}
+
+The interface reports the estimated three-year risk next to the observed three-year conversion rate of training participants in the same age group and with the same cognitive status, which gives the clinician an empirical reference point. It lists which categories were used and which were missing, and shows the SHAP contributions of each category and of the most influential individual items. When no cognitive information is available, it states that the estimate is little more than an age-based average.
+
+\section{Plausibility checks}
+
+Contradictory entries can produce estimates that look precise but are meaningless. For example, a MoCA score of 0 entered together with a status of ``normal'' and a CDR-SB of 0 yields a low risk, because the model gives most weight to the clinician's rating. The interface therefore checks the entries against the ranges observed in training data before showing a result. Entries that contradict each other (test scores below the first percentile of cognitively normal participants combined with a normal status; a CDR-SB above the 99th percentile for the stated status; systolic pressure not above diastolic; implausible smoking duration) are flagged and the estimate is marked as unreliable. Unusual but possible entries (age outside the 1st to 99th percentile of the training cohort, very low education, discordant PET values) generate a note.
+
+\section{Behaviour checks}
+
+Twenty-eight automated checks test the deployed model through the same code path as the interface. They confirm that the form covers every trained feature and no other; that typical cognitively normal, impaired and MCI cases receive plausible, correctly ordered estimates (0.6\%, 4.0\% and 60.8\%); that a worse CDR-SB, a worse cognitive status, lower test scores, more APOE $\varepsilon$4 alleles or more behavioural symptoms never lower the estimate; that contradictory entries are flagged; and that missing categories are reported. Twenty-seven checks pass. The remaining check compares predicted and observed risk within age and diagnosis groups on held-out data: ten of eleven groups agree within seven percentage points, but for participants with MCI under the age of 65 the model predicts 35\% against an observed 27\%. This over-prediction is reported as a known limitation.
+
+\section{Evidence assistant}
+
+The evidence assistant is a retrieval-augmented generation system \cite{lewis2020}. Its library consists of eleven open-access papers on dementia risk factors, vascular contributions, APOE, amyloid and tau PET and diagnostic criteria, divided into 447 passages. For a question, two rankings are computed, one by semantic similarity of sentence embeddings \cite{reimers2019} and one by BM25 keyword relevance \cite{robertson2009}, and merged by reciprocal rank fusion \cite{cormack2009}. If the best semantic similarity is below a fixed threshold (0.35), the assistant reports that the library contains no evidence on the question. Otherwise a small instruction-tuned language model running locally writes an answer from the retrieved passages with numbered citations; if the answer does not cite the passages correctly, the assistant quotes them directly instead. Questions asking for advice about a particular person are answered with a notice that the system cannot give individual medical advice, followed by general published information only. No data leave the machine.
+
+\begin{table}[H]
+\centering\small
+\caption{Evaluation of the evidence assistant (52 questions).}
+\label{tab:rag}
+\begin{tabular}{@{}lc@{}}
+\toprule
+Measure & Result \\
+\midrule
+Correct source ranked first (hybrid retrieval) & 32 of 32 \\
+Correct source ranked first (embeddings only / BM25 only) & 28 of 32 / 31 of 32 \\
+Personal-advice questions flagged & 8 of 8 \\
+General questions wrongly flagged as advice & 0 of 6 \\
+Out-of-scope questions declined & 6 of 6 \\
+Answers written with valid citations by the language model & 22\% (otherwise quoted) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+These results should be read with care. The library is small and the test questions were written by the project team, so retrieval is an easy test. The local language model is small and produced a properly cited answer for only about one question in five; direct quotation is the fallback and is the safer behaviour for medical content.

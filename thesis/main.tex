@@ -1,0 +1,45 @@
+% Draft thesis. Replace this preamble and the front matter with the department's
+% LaTeX template when it is available; the chapter files can be \input unchanged.
+\documentclass[12pt,a4paper,oneside]{report}
+\usepackage[T1]{fontenc}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{graphicx,booktabs,tabularx,amsmath,amssymb,siunitx,caption,float}
+\usepackage[hidelinks]{hyperref}
+\usepackage[numbers,sort&compress]{natbib}
+\graphicspath{{../reports/figures/}{figures/}}
+\setlength{\parskip}{4pt}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+
+\begin{document}
+\title{Three-Year Dementia Risk Prediction from Multimodal NACC Data:\
+Does Cardiovascular Information Add Value Beyond Cognition?}
+\author{Team names and roll numbers}
+\date{October 2026}
+\maketitle
+
+\tableofcontents
+\listoffigures
+\listoftables
+
+\chapter{Introduction}
+\textit{To be written (see docs/thesis\_outline.md).}
+
+\chapter{Literature Review}
+\textit{To be written (see docs/thesis\_outline.md).}
+
+\input{chapters/03_data}
+\input{chapters/04_method}
+\input{chapters/05_pet_images}
+\input{chapters/06_results}
+\input{chapters/07_system}
+\input{chapters/08_verification}
+
+\chapter{Discussion and Limitations}
+\textit{To be written (see docs/project\_audit.md).}
+
+\chapter{Conclusion and Future Work}
+\textit{To be written.}
+
+\bibliographystyle{IEEEtranN}
+\bibliography{references}
+\end{document}

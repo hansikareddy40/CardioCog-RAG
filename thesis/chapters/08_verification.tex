@@ -1,0 +1,47 @@
+\chapter{Verification and Reproducibility}
+\label{ch:verification}
+
+Clinical prediction studies are vulnerable to subtle errors that inflate performance: the same person in training and test data, information from the future in the features, mislabelled outcomes, or reported numbers that do not match the saved predictions. A separate verification program (\texttt{scripts/verify\_results.py}) was written to test for these errors independently of the main pipeline. Each check recomputes a quantity in a second, simpler way or tests a property that must hold if the pipeline is correct.
+
+\section{Checks}
+
+\begin{table}[H]
+\centering\small
+\caption{Independent verification checks and their results.}
+\label{tab:checks}
+\begin{tabularx}{\textwidth}{@{}lYY@{}}
+\toprule
+Group & Check & Result \\
+\midrule
+A & Raw files unchanged since the first audit; all 599 image folders present & Pass \\
+B & No participant in more than one partition; no held-out centre in the training data; saved split matches the modelling table & 0 participants and 0 centres shared \\
+C & Features at the first and third visit are identical when all later visits are deleted before the features are built & Identical for 1,500 participants $\times$ 67 features at each visit \\
+C & No PET value is newer than the visit at which it is used & 0 of 1,481 amyloid and 713 tau values \\
+D & Outcome labels recomputed with an independent implementation & 0 disagreements in 11,403 visits \\
+D & No eligible index visit has a dementia diagnosis & 0 of 134,943 \\
+E & With shuffled outcome labels, a retrained model falls to chance & AUROC 0.508 \\
+F & Reported AUROC values recomputed from the saved predictions & Largest difference 0 over 5 models and 2 evaluation sets \\
+F & Cohort sizes in the reports match the modelling table & Match \\
+G & Retraining from scratch with a new seed reproduces the result & Test 0.937, held-out 0.946 (reported 0.938, 0.946) \\
+G & Gain from the cardiovascular category with a fresh seed & $+0.0016$ \\
+H & Cohort flow and PET index counts in the reports match the data & Match \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+All seventeen checks passed on the final pipeline (re-run on 22 October 2026).
+
+\section{Errors found and corrected}
+
+The checks found two genuine errors in an earlier version of the pipeline, both of which used information that would not have been available at the time of prediction:
+
+\begin{enumerate}
+\item Missing education and race at an early visit had been filled in from a later visit for about 0.1\% of participants. Fixed characteristics are now carried forward only.
+\item PET scans had been matched to the nearest visit, which for many participants was a visit a few weeks before the scan. A scan is now used only at a visit on or after its acquisition date.
+\end{enumerate}
+
+After both corrections every model was retrained and every result regenerated. The main results changed only in the third decimal place. Earlier outputs were retained for comparison.
+
+\section{Reproducibility}
+
+All random seeds are fixed (2026 for the split, 0 to 2 for model training). Package versions are recorded in \texttt{requirements.txt}. The pipeline is run by a fixed sequence of scripts documented in the repository; given the NACC data, it regenerates every table in this thesis. Participant-level data and trained models are not distributed, in accordance with the data use agreement; all shared outputs are aggregates, and each report is checked automatically for participant identifiers before it is written.

@@ -54,3 +54,15 @@ Thumbs.db
 
 # Trained models are derived from NACC data: keep them local
 models/
+# LaTeX build files
+thesis/*.aux
+thesis/*.log
+thesis/*.out
+thesis/*.toc
+thesis/*.lof
+thesis/*.lot
+thesis/*.bbl
+thesis/*.blg
+thesis/*.fls
+thesis/*.fdb_latexmk
+thesis/*.synctex.gz
