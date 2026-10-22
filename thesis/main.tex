@@ -1,45 +1,151 @@
-% Draft thesis. Replace this preamble and the front matter with the department's
-% LaTeX template when it is available; the chapter files can be \input unchanged.
 \documentclass[12pt,a4paper,oneside]{report}
 \usepackage[T1]{fontenc}
-\usepackage[margin=2.5cm]{geometry}
-\usepackage{graphicx,booktabs,tabularx,amsmath,amssymb,siunitx,caption,float}
+\usepackage[top=2.5cm,bottom=2.5cm,left=2.5cm,right=2.5cm]{geometry}
+\usepackage{graphicx,booktabs,tabularx,amsmath,amssymb,caption,float,setspace,enumitem}
 \usepackage[hidelinks]{hyperref}
 \usepackage[numbers,sort&compress]{natbib}
-\graphicspath{{../reports/figures/}{figures/}}
-\setlength{\parskip}{4pt}
+\graphicspath{{figures/}{../reports/figures/}}
+\setlength{\parskip}{3pt}
+\setstretch{1.15}
 \newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\renewcommand{\bibname}{References}
+
+% ---------------------------------------------------------------- details
+\newcommand{\thesistitle}{Three-Year Dementia Risk Prediction from Multimodal Clinical Data: Does Cardiovascular Information Add Value Beyond Cognition?}
+\newcommand{\guide}{Dr.~[Guide Name]}
+\newcommand{\guidedesig}{[Designation]}
 
 \begin{document}
-\title{Three-Year Dementia Risk Prediction from Multimodal NACC Data:\
-Does Cardiovascular Information Add Value Beyond Cognition?}
-\author{Team names and roll numbers}
-\date{October 2026}
-\maketitle
+\pagenumbering{gobble}
 
+% ---------------------------------------------------------------- title page
+\begin{titlepage}
+\centering
+{\large\bfseries \thesistitle\par}
+\vspace{1.4cm}
+{\large A Thesis\par}
+\vspace{0.25cm}
+Submitted in partial fulfilment for the Degree of\par
+\vspace{0.2cm}
+BACHELOR OF TECHNOLOGY\par
+\vspace{0.2cm}
+in\par
+\vspace{0.2cm}
+COMPUTER SCIENCE AND ENGINEERING (ARTIFICIAL INTELLIGENCE)\par
+\vspace{1.0cm}
+by\par
+\vspace{0.4cm}
+{\large\bfseries
+V Gouri Hansika Reddy - CB.SC.U4AIE23304\par
+Mahidhar Reddy Akula - [ROLL NUMBER]\par
+Akhil Vighnesh - CB.SC.U4AIE23303\par
+P Bhargava Reddy - CB.SC.U4AIE23329\par}
+\vspace{1.4cm}
+\includegraphics[width=0.62\textwidth]{amrita_logo.png}\par
+\vspace{1.4cm}
+DEPARTMENT OF ARTIFICIAL INTELLIGENCE\par
+\vspace{0.15cm}
+{\large\bfseries AMRITA VISHWA VIDYAPEETHAM\par}
+\vspace{0.15cm}
+COIMBATORE CAMPUS (INDIA)\par
+\vspace{0.6cm}
+{\large October 2026\par}
+\end{titlepage}
+
+% ---------------------------------------------------------------- bonafide
+\begin{center}
+DEPARTMENT OF ARTIFICIAL INTELLIGENCE\par
+{\large\bfseries AMRITA VISHWA VIDYAPEETHAM\par}
+COIMBATORE CAMPUS\par
+\vspace{1.2cm}
+\includegraphics[width=0.62\textwidth]{amrita_logo.png}\par
+\vspace{1.4cm}
+{\large\bfseries BONAFIDE CERTIFICATE\par}
+\end{center}
+\vspace{0.5cm}
+\noindent This is to certify that the thesis entitled ``\textbf{\thesistitle}'' submitted by \textbf{V Gouri Hansika Reddy, CB.SC.U4AIE23304}, \textbf{Mahidhar Reddy Akula, [ROLL NUMBER]}, \textbf{Akhil Vighnesh, CB.SC.U4AIE23303} and \textbf{P Bhargava Reddy, CB.SC.U4AIE23329} for the award of the \textbf{Degree of Bachelor of Technology} under the \textbf{Faculty of Engineering} is a bonafide record of the work carried out by them under my guidance and supervision at ``Department of Artificial Intelligence'', Amrita Vishwa Vidyapeetham, Coimbatore Campus.
+
+\vspace{0.8cm}
+\noindent\hspace{0.6cm}Submitted for the examination held on [DATE].
+
+\vspace{1.0cm}
+\noindent\hspace{0.6cm}\textbf{INTERNAL EXAMINER} \hfill \textbf{EXTERNAL EXAMINER}\hspace{0.6cm}
+
+\vspace{1.4cm}
+\begin{center}
+\textbf{\guide}\\
+Thesis Advisor,\\
+\guidedesig,\\
+Department of Artificial Intelligence,\\
+Amrita Vishwa Vidyapeetham,\\
+Coimbatore Campus,\\
+India.
+\end{center}
+\newpage
+
+% ---------------------------------------------------------------- declaration
+\begin{center}
+DEPARTMENT OF ARTIFICIAL INTELLIGENCE\par
+{\large\bfseries AMRITA VISHWA VIDYAPEETHAM\par}
+COIMBATORE CAMPUS\par
+\vspace{2.6cm}
+{\large\bfseries DECLARATION\par}
+\end{center}
+\vspace{0.5cm}
+\noindent We, \textbf{V Gouri Hansika Reddy, CB.SC.U4AIE23304}, \textbf{Mahidhar Reddy Akula, [ROLL NUMBER]}, \textbf{Akhil Vighnesh, CB.SC.U4AIE23303} and \textbf{P Bhargava Reddy, CB.SC.U4AIE23329} hereby declare that this thesis entitled ``\textbf{\thesistitle}'' is the record of the original work done by us under the guidance of \textbf{\guide}, \guidedesig, Department of Artificial Intelligence, Amrita Vishwa Vidyapeetham, Coimbatore Campus. To the best of our knowledge, this work has not formed the basis for the award of any degree/diploma/associateship/fellowship or a similar award to any candidate in any University.
+
+\vspace{1.8cm}
+\noindent\textbf{Place: Coimbatore, India} \hfill \textbf{Signature of the Students}\\
+\textbf{Date: [DATE]}
+
+\vspace{2.4cm}
+\begin{center}
+COUNTERSIGNED\par
+\vspace{2.0cm}
+\textbf{Dr. K.P Soman}\\
+Professor and Dean,\\
+Department of Artificial Intelligence\\
+Amrita Vishwa Vidyapeetham,\\
+Coimbatore Campus,\\
+India.
+\end{center}
+\newpage
+
+% ---------------------------------------------------------------- front matter
+\pagenumbering{roman}
+\setcounter{page}{1}
 \tableofcontents
-\listoffigures
-\listoftables
+\clearpage
+\input{chapters/00_front}
 
-\chapter{Introduction}
-\textit{To be written (see docs/thesis\_outline.md).}
-
-\chapter{Literature Review}
-\textit{To be written (see docs/thesis\_outline.md).}
-
+% ---------------------------------------------------------------- chapters
+\clearpage
+\pagenumbering{arabic}
+\setcounter{page}{1}
+\input{chapters/01_introduction}
+\input{chapters/02_literature}
 \input{chapters/03_data}
 \input{chapters/04_method}
 \input{chapters/05_pet_images}
 \input{chapters/06_results}
 \input{chapters/07_system}
 \input{chapters/08_verification}
+\input{chapters/09_discussion}
+\input{chapters/10_conclusion}
 
-\chapter{Discussion and Limitations}
-\textit{To be written (see docs/project\_audit.md).}
+\appendix
+\input{chapters/appendix}
 
-\chapter{Conclusion and Future Work}
-\textit{To be written.}
-
+\cleardoublepage
+\phantomsection
+\addcontentsline{toc}{chapter}{References}
 \bibliographystyle{IEEEtranN}
 \bibliography{references}
+
+\cleardoublepage
+\phantomsection
+\addcontentsline{toc}{chapter}{List of Publications Based on the Research Work}
+\chapter*{List of Publications\\[0.2em]\large(Based on the Research Work)}
+No publications or communicated papers were produced from this thesis work at the time of submission.
+
 \end{document}

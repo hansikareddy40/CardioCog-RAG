@@ -1,0 +1,37 @@
+\chapter{Conclusion and Scope for Further Research}
+\label{ch:conclusion}
+
+\section{Conclusion}
+
+This thesis set out to estimate, for people without dementia at a clinic visit, the probability of a dementia diagnosis within three years, and to establish which kinds of information contribute to that estimate. Using 19,470 participants from the NACC database under a person-level split with nine held-out centres, the answers to the six research questions are as follows.
+
+\begin{enumerate}[label=\textbf{RQ\arabic*.},leftmargin=*]
+\item Three-year conversion to dementia can be predicted with an AUROC of 0.94 in the combined cohort and 0.95 at held-out centres. Within participants with MCI the AUROC is about 0.84, and within cognitively normal participants about 0.88, with wide uncertainty.
+\item Cardiovascular and medical history adds about 0.001 AUROC once current cognition is known; it has limited incremental value in this cohort and setting.
+\item Amyloid and tau PET measures did not produce a demonstrable gain over the clinical model with the follow-up currently available.
+\item Deep-learning models (a multilayer perceptron and an FT-Transformer) performed no better than logistic regression or gradient-boosted trees.
+\item Earlier visits added between 0.000 and 0.005 AUROC beyond the current visit.
+\item A model trained with modality dropout remained close to specialist models when whole categories of information were missing, whereas a standard model became badly calibrated.
+\end{enumerate}
+
+Most of the predictive information lies in the current cognitive and clinical state. The results are robust to the exclusion of participants with unknown outcomes, to reversed diagnoses and to retraining with different seeds, and the pipeline passed seventeen independent verification checks after two sources of information leakage had been found and corrected. Alongside the models, the work produced a PET image pipeline whose amyloid measurements agree with the PET core's (correlation 0.98), and a research prototype that checks the plausibility of its inputs and supports its output with an evidence assistant restricted to published sources.
+
+\section{Scope for Further Research}
+
+\subsection{External and Temporal Validation}
+The model should be evaluated on an independent cohort with different recruitment and on participants enrolled after the training period.
+
+\subsection{Cognitively Normal Participants and Longer Horizons}
+A model built specifically for cognitively normal participants, with a five- or ten-year horizon, would have more events and more room for cardiovascular and PET information to contribute.
+
+\subsection{Richer Cardiovascular Exposure}
+Repeated blood-pressure measurements over many visits, treatment history and imaging markers of small vessel disease could capture vascular burden better than yes/no history.
+
+\subsection{PET with Longer Follow-up}
+As more scanned participants reach three or more years of follow-up, the added value of amyloid and tau PET can be tested with adequate power, and MRI-based processing of the images can improve quantification.
+
+\subsection{Evidence Assistant}
+A larger, curated library, an independently written evaluation set and a stronger local language model would make the assistant more useful.
+
+\section{Closing Observation}
+A carefully measured negative result is still a result. In a large, well-characterised cohort, the information that best predicts dementia in the next three years is how a person is functioning today; the factors that shaped the brain over decades leave their trace in that measurement rather than adding to it.

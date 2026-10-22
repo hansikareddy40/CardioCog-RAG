@@ -1,0 +1,45 @@
+\chapter{Literature Review}
+\label{ch:lit}
+
+\section{Dementia, Mild Cognitive Impairment and Their Definition}
+
+Clinical diagnosis of dementia rests on a decline in cognition that interferes with independence in daily activities, whereas MCI denotes measurable impairment with preserved independence. Alzheimer's disease, the most common cause, has increasingly been defined biologically rather than by its clinical presentation. The Alzheimer's Association workgroup updated the 2018 research framework in 2024, defining the disease by biomarkers of its characteristic pathology, amyloid plaques and tau tangles, measured in fluid or by PET, and staging it separately from the clinical syndrome \cite{jack2024}. This distinction matters for prediction studies: an outcome defined by clinical diagnosis, as in this thesis, measures progression of the syndrome, not of the underlying pathology.
+
+\section{Modifiable and Cardiovascular Risk Factors}
+
+The 2020 report of the Lancet Commission on dementia prevention described a life-course model with twelve potentially modifiable risk factors, including hypertension, diabetes, obesity, smoking and physical inactivity, which together account for around 40\% of dementias worldwide \cite{livingston2020}. Hypertension, particularly in midlife, has been related to a higher risk of cognitive decline and dementia, although the association is complex and differs with age at measurement \cite{sierra2020}. Hypertension is the main risk factor for cerebral small vessel disease, a leading vascular contributor to cognitive impairment \cite{hainsworth2024}. A recent meta-analysis found that higher cumulative systolic blood pressure was associated with incident dementia (odds ratio 1.21, 95\% CI 1.00--1.45), while associations with diastolic pressure were inconsistent \cite{wang2026}. For diabetes, a meta-analysis of 15 studies reported a pooled relative risk of dementia of 1.59 (95\% CI 1.40--1.80) \cite{cao2024}, and among people with MCI, diabetes or the metabolic syndrome was associated with faster progression to dementia (pooled odds ratio 1.67, 95\% CI 1.27--2.19) \cite{pal2018}. In people without dementia, a higher Framingham cardiovascular risk score has been associated with more small vessel disease and with lower cerebrospinal fluid amyloid-$\beta$, with small vessel disease mediating the association \cite{lorenzini2024}.
+
+These studies establish associations, mostly with exposure measured in midlife or accumulated over many years. They do not by themselves show how much cardiovascular information adds to a prediction model that already contains measurements of current cognition, which is the question addressed in this thesis.
+
+\section{Genetic Risk}
+
+The $\varepsilon$4 allele of the APOE gene is the major genetic risk factor for late-onset Alzheimer's disease; APOE is the main cholesterol carrier in the brain and is involved in lipid transport and synaptic function \cite{wolfe2018}. In cohort data the genotype is not always available, and whether a participant was genotyped is not random, which has to be handled explicitly when building features.
+
+\section{Amyloid and Tau PET}
+
+PET with amyloid tracers measures cortical amyloid deposition, tau tracers measure neurofibrillary tangle pathology, and FDG measures glucose metabolism as an index of neuronal activity \cite{chandra2019}. Tau PET is technically more demanding than amyloid PET, with tracer-specific binding properties and off-target signal \cite{leuzy2019}. Because amyloid SUVR values depend on the tracer and the processing pipeline, the Centiloid scale was introduced to express amyloid burden on a common scale anchored at young controls (0) and typical Alzheimer's dementia (100) \cite{klunk2015}. These properties motivate the use of Centiloids for amyloid and within-tracer standardisation for tau in this thesis.
+
+\section{Machine Learning for Tabular Clinical Data}
+
+Clinical cohort data are tabular: a mixture of continuous, ordinal and categorical variables with substantial missingness. Logistic regression remains the reference method in clinical prediction because it is transparent and often well calibrated. Ensembles of decision trees, such as random forests \cite{breiman2001} and gradient-boosted trees as implemented in XGBoost \cite{chen2016}, capture non-linear effects and interactions and handle missing values naturally. Deep-learning models for tables have been proposed repeatedly; in a systematic comparison, Gorishniy et al.\ introduced the FT-Transformer, which embeds each feature as a token and applies self-attention, and found it to be a strong deep baseline while also observing that no deep model was universally superior to gradient-boosted trees \cite{gorishniy2021}. For sequences of visits, recurrent networks such as the gated recurrent unit \cite{cho2014} can read a participant's history directly.
+
+Evaluation of prediction models requires more than discrimination. Calibration, clinical usefulness assessed by decision curve analysis \cite{vickers2006}, and robustness to censoring, handled with survival methods such as the Kaplan--Meier estimator \cite{kaplan1958} and the Cox model \cite{cox1972}, are all needed before a model can be interpreted.
+
+\section{Explainability}
+
+Shapley additive explanations (SHAP) attribute a prediction to the input features using Shapley values from cooperative game theory, with the property that the contributions sum to the prediction \cite{lundberg2017}. For tree ensembles, exact values can be computed efficiently with TreeSHAP \cite{lundberg2020}. For convolutional networks, gradient-weighted class activation mapping (Grad-CAM) highlights image regions that influence the output \cite{selvaraju2017}. In both cases the explanation describes what the model uses, not what causes the outcome.
+
+\section{Retrieval-Augmented Generation}
+
+Language models can produce fluent but unsupported statements, which is a particular risk in medicine. Retrieval-augmented generation conditions the generated text on passages retrieved from a defined collection \cite{lewis2020}. Retrieval can use sentence embeddings \cite{reimers2019}, keyword ranking functions such as BM25 \cite{robertson2009}, or a combination of rankings, for which reciprocal rank fusion is a simple and effective method \cite{cormack2009}.
+
+\section{Data Source}
+
+The National Alzheimer's Coordinating Center maintains the Uniform Data Set, a standardised longitudinal assessment administered at Alzheimer's Disease Research Centers across the United States. Version~3 of the neuropsychological battery, introduced in 2015, replaced several proprietary tests with new ones \cite{weintraub2018}, which creates the harmonisation problem addressed in Chapter~\ref{ch:method}.
+
+\section{Research Gap}
+
+The epidemiological literature establishes that vascular risk factors, APOE and amyloid and tau pathology are associated with dementia. Prediction studies frequently report high discrimination, but such figures depend strongly on who is included and on whether current cognitive status is among the inputs. Three questions are less often answered together on one large cohort under a strict, leakage-controlled design: how much each source of information adds once current cognition is known, whether deep-learning models improve on classical ones for this kind of data, and how results differ between cognitively normal participants and participants with MCI. This thesis addresses these questions on the NACC database, reports results by baseline diagnosis, and accompanies the model with a validated PET image pipeline, a clinician-facing prototype and independent verification of the pipeline.
+
+\medskip
+\noindent\textit{[Team: add two to four published machine-learning studies of dementia or MCI-to-dementia prediction on NACC or ADNI that you have read, with one or two sentences each on their cohort, inputs and results, and compare them with ours in Chapter~\ref{ch:discussion}.]}

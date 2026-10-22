@@ -1,0 +1,57 @@
+\chapter{Introduction}
+\label{ch:intro}
+
+\section{Background and Motivation}
+
+Dementia is a clinical syndrome in which memory and other cognitive abilities decline to the point that a person can no longer manage daily life independently. Alzheimer's disease is its most common cause. The underlying brain changes begin years before the diagnosis, and many people pass through an intermediate stage, mild cognitive impairment (MCI), in which deficits are measurable but daily function is preserved. Not everyone with MCI progresses, and some people who appear cognitively normal decline within a few years. Estimating who is likely to progress in the near future is useful for monitoring, for planning care and for selecting participants for clinical trials.
+
+A wide range of information is available for this purpose. Demographic characteristics, in particular age, are strong risk factors. Cardiovascular and metabolic conditions such as hypertension and diabetes have been associated with later dementia in epidemiological studies \cite{livingston2020,sierra2020,hainsworth2024,cao2024}. The APOE $\varepsilon$4 allele is the major genetic risk factor for late-onset Alzheimer's disease \cite{wolfe2018}. Neuropsychological tests and clinical ratings measure the current state of cognition and function, and amyloid and tau PET imaging measures the pathology directly \cite{chandra2019,leuzy2019}. What is less clear is how much each source adds once the others are known, and whether the added complexity of modern machine-learning models is justified for such data.
+
+\section{How the Research Question Developed}
+
+The project began with a broad aim: to predict cognitive decline from cardiovascular risk factors combined with longitudinal cognitive data, APOE and PET biomarkers, and to explain the predictions with supporting literature. Before any model was built, the data were audited in detail. The audit showed that the clinical diagnosis and the Clinical Dementia Rating are recorded consistently at every visit across twenty years of data, that roughly one in three participants with MCI progresses to dementia within three years, and that most PET scans are too recent to observe long-term outcomes. On this basis the aim was narrowed to one precise and measurable question: the probability of a dementia diagnosis within three years of a clinic visit. The original cardiovascular hypothesis was retained, but as a question to be tested rather than an assumption: whether cardiovascular information adds predictive value once current cognition is known.
+
+\section{Problem Statement}
+
+Let $\mathbf{x}_{t_0}$ denote the information available about a person without dementia at an index visit $t_0$: demographics, cardiovascular and medical history, neuropsychological test results, the clinician's rating, genetics and, where available, PET measures. The problem is to estimate
+\begin{equation}
+\hat{p} = P\left(y = 1 \mid \mathbf{x}_{t_0}\right),
+\end{equation}
+where $y = 1$ if dementia is diagnosed within three years of $t_0$ and $y = 0$ if the person is followed for three years without such a diagnosis; to determine how much each category of information contributes to $\hat{p}$; and to do so without using any information that would not have been available at $t_0$.
+
+\section{Research Questions and Objectives}
+
+The study addresses six research questions:
+\begin{enumerate}[label=\textbf{RQ\arabic*.},leftmargin=*]
+\item How accurately can a dementia diagnosis within three years be predicted for people without dementia, and how does this differ between cognitively normal people and people with MCI?
+\item Does cardiovascular and medical information improve the prediction beyond demographics, genetics and current cognition?
+\item Do amyloid and tau PET measures improve the prediction?
+\item Do deep-learning models outperform classical models on this kind of data?
+\item Does information from earlier visits improve the prediction beyond the current visit?
+\item Can a single model provide calibrated estimates when whole categories of information are missing?
+\end{enumerate}
+
+The corresponding objectives were to construct a leakage-free cohort and outcome from the NACC database; to harmonise neuropsychological tests across form versions; to train and compare five classifiers under a person-level split with held-out centres; to measure the contribution of each category by ablation; to explain predictions with Shapley values; to test the added value of PET and of earlier visits; to validate the model in subgroups, for calibration and in sensitivity analyses; to build and validate a PET image pipeline; to integrate the model into a research prototype with an evidence assistant; and to verify the integrity of the entire pipeline with independent checks.
+
+\section{Contributions}
+
+\begin{itemize}
+\item A reproducible pipeline that turns the NACC database into a leakage-free three-year prediction task, with test harmonisation across form versions.
+\item A controlled comparison of five model families showing that deep-learning models offer no advantage over logistic regression or gradient boosting on these data.
+\item A quantified answer to the cardiovascular question: in this cohort and setting, cardiovascular and medical history adds about 0.001 AUROC once current cognition is known.
+\item Results reported separately for cognitively normal participants and participants with MCI, and a measurement of how strongly the prediction depends on current cognitive status.
+\item A PET image pipeline validated against the PET core's own measurements.
+\item A research prototype with input plausibility checks and an evidence assistant restricted to published sources.
+\item A set of independent verification checks that found and corrected two sources of information leakage.
+\end{itemize}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{pipeline.png}
+\caption{Overview of the work presented in this thesis.}
+\label{fig:pipeline}
+\end{figure}
+
+\section{Organisation of the Thesis}
+
+Chapter~\ref{ch:lit} reviews related work. Chapter~\ref{ch:data} describes the data. Chapter~\ref{ch:method} presents the prediction task, cohort, features, models and evaluation. Chapter~\ref{ch:petimages} describes the PET image pipeline. Chapter~\ref{ch:results} reports the results. Chapter~\ref{ch:system} describes the prototype. Chapter~\ref{ch:verification} describes the verification of the pipeline. Chapter~\ref{ch:discussion} discusses the findings and their limitations, and Chapter~\ref{ch:conclusion} concludes. The appendices list the features and the reproduction steps.

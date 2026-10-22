@@ -11,11 +11,18 @@ where $t_0$ is the date of the index visit and $\mathbf{x}_{t_0}$ the feature ve
 
 \subsection{Choice of horizon and outcome}
 
-Clinical diagnosis (\texttt{NACCUDSD}) and the Clinical Dementia Rating are recorded at every visit in every form version, which makes them the most consistent outcomes available. A dementia diagnosis was chosen as the main outcome because it is clinically meaningful and easy to interpret. The three-year horizon balances the number of events against loss to follow-up: Kaplan--Meier estimates show that about 35\% of participants with MCI progress to dementia within three years, and that 11\% of cognitively normal participants progress to MCI or dementia, while the number of participants with a known status falls steadily with longer horizons and most PET scans are too recent for a five-year horizon.
+Clinical diagnosis (\texttt{NACCUDSD}) and the Clinical Dementia Rating are recorded at every visit in every form version, which makes them the most consistent outcomes available. A dementia diagnosis was chosen as the main outcome because it is clinically meaningful and easy to interpret. The three-year horizon balances the number of events against loss to follow-up: Kaplan--Meier estimates \cite{kaplan1958} show that about 35\% of participants with MCI progress to dementia within three years, and that 11\% of cognitively normal participants progress to MCI or dementia, while the number of participants with a known status falls steadily with longer horizons and most PET scans are too recent for a five-year horizon.
 
 \subsection{Censoring}
 
-A participant last seen less than three years after the index visit without a dementia diagnosis has an unknown outcome. Such participants were excluded from the binary task rather than counted as negative, which would bias the estimated risk downwards. Because this exclusion could itself introduce bias, a Cox proportional hazards model that uses all eligible participants, including the censored ones, was fitted as a robustness check (Section~\ref{sec:res_sens}).
+A participant last seen less than three years after the index visit without a dementia diagnosis has an unknown outcome. Such participants were excluded from the binary task rather than counted as negative, which would bias the estimated risk downwards. Because this exclusion could itself introduce bias, a Cox proportional hazards model \cite{cox1972} that uses all eligible participants, including the censored ones, was fitted as a robustness check (Section~\ref{sec:res_sens}). Figure~\ref{fig:outcome} illustrates the three possible cases.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{outcome.png}
+\caption{Definition of the outcome. Only the index visit supplies features; later visits supply the label.}
+\label{fig:outcome}
+\end{figure}
 
 \section{Cohort}
 
@@ -52,7 +59,14 @@ z = \frac{s - \hat{s}}{\sigma_{\text{res}}},
 \end{equation}
 where $\sigma_{\text{res}}$ is the residual standard deviation of the fitted model. The sign is reversed for the two timed Trail Making tests, so that a negative $z$ always means worse than expected. Values were clipped to $[-5, 5]$. The $z$-scores of the tests in one cognitive domain were then averaged to give six domain scores: global screening (MoCA, MMSE), memory, attention, speed and executive function, language, and visuospatial function. A participant receives a domain score from whichever tests their visit contained.
 
-As an example, for the MoCA the fitted model is $\hat{s} = 23.0 - 0.059\,\text{age} + 0.33\,\text{female} + 0.42\,\text{education}$ with $\sigma_{\text{res}} = 2.56$, estimated from 6,264 normal participants. A 72-year-old woman with 16 years of education has an expected score of 25.8, so a score of 21 corresponds to $z = -1.9$.
+As an example, for the MoCA the fitted model is $\hat{s} = 23.0 - 0.059\,\text{age} + 0.33\,\text{female} + 0.42\,\text{education}$ with $\sigma_{\text{res}} = 2.56$, estimated from 6,264 normal participants. A 72-year-old woman with 16 years of education has an expected score of 25.8, so a score of 21 corresponds to $z = -1.9$ (Figure~\ref{fig:zscore}).
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{zscore.png}
+\caption{Demographically adjusted $z$-score for the MoCA, using the fitted normative model.}
+\label{fig:zscore}
+\end{figure}
 
 Three further cognitive features were derived: the number of tests the participant could not complete for cognitive or behavioural reasons (NACC code 96 or 996), which is informative about severity and is therefore kept rather than treated as missing; the Geriatric Depression Scale total; and the number of NPI-Q behavioural symptoms present.
 
@@ -88,6 +102,13 @@ Held-out centres & 4,064 & 545 \\
 \bottomrule
 \end{tabular}
 \end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{split.png}
+\caption{Participant-level partitions of the main cohort.}
+\label{fig:split}
+\end{figure}
 
 Every quantity estimated from data (normative models for $z$-scores, tau standardisation, imputation medians, scaling) was fitted on the training set and applied unchanged to the other sets. The validation set was used for early stopping and model selection; the test set and the held-out centres were used only for evaluation.
 

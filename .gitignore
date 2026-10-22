@@ -66,3 +66,5 @@ thesis/*.blg
 thesis/*.fls
 thesis/*.fdb_latexmk
 thesis/*.synctex.gz
+thesis/main.pdf
+thesis/build.log

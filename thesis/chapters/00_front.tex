@@ -1,0 +1,96 @@
+% ---------------------------------------------------------------- acknowledgements
+\chapter*{Acknowledgements}
+\addcontentsline{toc}{chapter}{Acknowledgements}
+
+We express our sincere gratitude to our thesis advisor, \guide, for guidance and constructive feedback throughout this work. We thank the Department of Artificial Intelligence, Amrita Vishwa Vidyapeetham, Coimbatore Campus, for the academic environment and facilities that made this project possible, and the faculty members and review panel for their suggestions on the research design and evaluation. We are grateful to our families and friends for their support.
+
+This work uses data from the National Alzheimer's Coordinating Center (NACC). We thank the NACC, the Alzheimer's Disease Research Centers that contribute to it, and above all the research participants and their study partners.
+
+\medskip
+\noindent\textit{[Insert here, word for word, the NACC acknowledgement statement and grant information required by the NACC data use agreement, as published on naccdata.org. Do not paraphrase it.]}
+
+\vspace{1.5cm}
+\begin{flushright}
+V GOURI HANSIKA REDDY\\
+MAHIDHAR REDDY AKULA\\
+AKHIL VIGHNESH\\
+P BHARGAVA REDDY
+\end{flushright}
+
+% ---------------------------------------------------------------- lists
+\cleardoublepage
+\phantomsection
+\addcontentsline{toc}{chapter}{List of figures}
+\listoffigures
+
+\cleardoublepage
+\phantomsection
+\addcontentsline{toc}{chapter}{List of tables}
+\listoftables
+
+% ---------------------------------------------------------------- abbreviations
+\chapter*{Abbreviations}
+\addcontentsline{toc}{chapter}{Abbreviations}
+\begin{center}
+\begin{tabular}{@{}lcl@{}}
+APOE & -- & Apolipoprotein E \\
+AUPRC & -- & Area Under the Precision--Recall Curve \\
+AUROC & -- & Area Under the Receiver Operating Characteristic Curve \\
+BM25 & -- & Best Matching 25 (keyword ranking function) \\
+BMI & -- & Body Mass Index \\
+CDR & -- & Clinical Dementia Rating \\
+CDR-SB & -- & Clinical Dementia Rating, Sum of Boxes \\
+CI & -- & Confidence Interval \\
+CNN & -- & Convolutional Neural Network \\
+DICOM & -- & Digital Imaging and Communications in Medicine \\
+FAQ & -- & Functional Activities Questionnaire \\
+FDG & -- & Fluorodeoxyglucose \\
+FT-Transformer & -- & Feature Tokenizer Transformer \\
+GDS & -- & Geriatric Depression Scale \\
+GRU & -- & Gated Recurrent Unit \\
+MCI & -- & Mild Cognitive Impairment \\
+MLP & -- & Multilayer Perceptron \\
+MMSE & -- & Mini-Mental State Examination \\
+MoCA & -- & Montreal Cognitive Assessment \\
+NACC & -- & National Alzheimer's Coordinating Center \\
+NPI-Q & -- & Neuropsychiatric Inventory Questionnaire \\
+PET & -- & Positron Emission Tomography \\
+RAG & -- & Retrieval-Augmented Generation \\
+SHAP & -- & SHapley Additive exPlanations \\
+SUVR & -- & Standardised Uptake Value Ratio \\
+UDS & -- & Uniform Data Set \\
+XGBoost & -- & Extreme Gradient Boosting \\
+\end{tabular}
+\end{center}
+
+% ---------------------------------------------------------------- symbols
+\chapter*{List of symbols}
+\addcontentsline{toc}{chapter}{List of symbols}
+\begin{center}
+\begin{tabular}{@{}lcl@{}}
+$\mathbf{x}_{t_0}$ & -- & Feature vector at the index visit \\
+$t_0$ & -- & Date of the index visit \\
+$y$ & -- & Outcome: dementia diagnosis within three years (1) or not (0) \\
+$\hat{p}$ & -- & Predicted probability of the outcome \\
+$s$ & -- & Raw neuropsychological test score \\
+$\hat{s}$ & -- & Expected test score of a cognitively normal person \\
+$\sigma_{\text{res}}$ & -- & Residual standard deviation of the normative model \\
+$z$ & -- & Demographically adjusted test score \\
+$\beta_k$ & -- & Coefficients of the normative regression model \\
+$\phi_j$ & -- & SHAP contribution of feature $j$ \\
+$\Delta$AUROC & -- & Paired difference in AUROC between two models \\
+$p_{\text{drop}}$ & -- & Probability of removing a category in modality dropout \\
+$B$ & -- & Brier score \\
+\end{tabular}
+\end{center}
+
+% ---------------------------------------------------------------- abstract
+\chapter*{Abstract}
+\addcontentsline{toc}{chapter}{Abstract}
+
+Dementia develops over several years, and many kinds of information are routinely recorded about older adults who do not yet have it: demographic characteristics, cardiovascular and medical history, neuropsychological test results, a clinician's rating of daily functioning, the APOE genotype and, increasingly, amyloid and tau positron emission tomography (PET). It is not well established how much each of these sources contributes to short-term prediction once the others are known. This thesis develops and evaluates an explainable framework that estimates, for a person without dementia at a clinic visit, the probability of a dementia diagnosis within the following three years, and measures the contribution of each source, with particular attention to cardiovascular information.
+
+The study uses the National Alzheimer's Coordinating Center database (57,038 participants, 217,598 visits). After harmonising neuropsychological tests from different form versions with demographically adjusted $z$-scores and constructing 48 features in five categories, 19,470 participants without dementia and with a known three-year outcome were analysed, of whom 2,818 were diagnosed with dementia. Participants were split by person, and nine whole centres were held out for evaluation. Five classifiers, from logistic regression to an FT-Transformer, achieved nearly identical discrimination (test AUROC 0.932 to 0.939; held-out centres 0.940 to 0.946). Within participants with mild cognitive impairment the AUROC was 0.84, and within cognitively normal participants 0.88, the latter based on few events. Most of the predictive signal came from current cognitive status; cardiovascular and medical history added about 0.001 AUROC beyond it, earlier visits added at most 0.005, and amyloid and tau PET measures did not produce a demonstrable gain. Training with modality dropout kept predictions calibrated when whole categories of input were missing. A separate PET image pipeline reproduced the PET core's amyloid measurements (correlation 0.98 over 318 scans). The models were integrated into a research prototype with plausibility checks and a retrieval-based evidence assistant, and the pipeline was audited by seventeen independent verification checks, which identified and corrected two sources of information leakage.
+
+\medskip
+\noindent\textbf{Keywords:} dementia prediction, mild cognitive impairment, NACC, cardiovascular risk, explainable machine learning, SHAP, amyloid PET, retrieval-augmented generation.
