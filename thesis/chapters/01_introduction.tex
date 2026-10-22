@@ -11,6 +11,34 @@ A wide range of information is available for this purpose. Demographic character
 
 The project began with a broad aim: to predict cognitive decline from cardiovascular risk factors combined with longitudinal cognitive data, APOE and PET biomarkers, and to explain the predictions with supporting literature. Before any model was built, the data were audited in detail. The audit showed that the clinical diagnosis and the Clinical Dementia Rating are recorded consistently at every visit across twenty years of data, that roughly one in three participants with MCI progresses to dementia within three years, and that most PET scans are too recent to observe long-term outcomes. On this basis the aim was narrowed to one precise and measurable question: the probability of a dementia diagnosis within three years of a clinic visit. The original cardiovascular hypothesis was retained, but as a question to be tested rather than an assumption: whether cardiovascular information adds predictive value once current cognition is known.
 
+\section{Changes from the Initial Proposal}
+
+The framework proposed at the zeroth review was designed before the data had been examined. Several of its components were changed once the data audit and the first experiments showed what the data could support. Table~\ref{tab:plan} records each change and its reason.
+
+\begin{table}[H]
+\centering\footnotesize
+\caption{Planned components at the zeroth review and what was implemented.}
+\label{tab:plan}
+\begin{tabularx}{\textwidth}{@{}p{3.3cm}p{3.6cm}Y@{}}
+\toprule
+Planned & Implemented & Reason \\
+\midrule
+Target: cognitive decline and progression, not yet fixed & Dementia diagnosis within three years; CDR-SB rise of one point built as a secondary label & Diagnosis is recorded consistently at every visit in every form version, and the three-year horizon balances events against loss to follow-up \\
+Dataset: NACC via the ADSP-PHC harmonised release, NHANES & NACC Freeze 74 (UDS and SCAN PET tables, raw PET images) & The UDS release contains all required clinical variables with longitudinal visits and links to the PET data; NHANES does not provide longitudinal dementia diagnoses \\
+XGBoost or CatBoost for tabular data & Logistic regression, random forest, XGBoost, MLP and FT-Transformer & A wider comparison answers whether model complexity helps; the models performed equally, so CatBoost was not added \\
+LSTM or Transformer for cognitive trajectories & Trajectory features and a GRU on landmark visits & A GRU is the smaller recurrent model suited to short, irregular sequences of at most six visits; history added little \\
+3D ResNet for PET with attention-based fusion & Small 3D CNN for amyloid status; late fusion of PET measures; modality dropout for missing data & Only 5 of 446 participants with images converted to dementia, so an image-based fusion model for progression could not be trained reliably; an early prototype of this kind gave unstable results (Section~\ref{sec:prelim}) \\
+SHAP, Grad-CAM, attention weights, DiCE & SHAP and Grad-CAM & Counterfactual explanations suggest what to change in a patient, which the observational data cannot support \\
+RAG grounding of predictions & Evidence assistant with hybrid retrieval and guardrails & Implemented as planned, with retrieval evaluated against a fixed question set \\
+Target AUROC 0.70 to 0.78 & AUROC 0.94 overall, 0.84 within MCI & The overall figure is higher than expected mainly because current cognitive status is a strong predictor; results are reported per diagnostic group for this reason \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Preliminary Experiment}
+\label{sec:prelim}
+An early prototype followed the original plan closely: a 3D CNN on raw PET volumes fused with clinical features through cross-attention, predicting a rise of at least 0.5 in CDR-SB after one year. Only 198 participants had both a usable image and a one-year outcome, of whom 17 progressed. Under five-fold cross-validation the fused model reached a mean AUROC of 0.65 with fold values ranging from 0.40 to 0.86, and tabular models alone did no better than 0.78 with a standard deviation above 0.1. With so few events the estimates were too unstable to support any conclusion. This motivated the change to the full clinical cohort, a three-year dementia outcome, and a separate, validated treatment of the PET images.
+
 \section{Problem Statement}
 
 Let $\mathbf{x}_{t_0}$ denote the information available about a person without dementia at an index visit $t_0$: demographics, cardiovascular and medical history, neuropsychological test results, the clinician's rating, genetics and, where available, PET measures. The problem is to estimate
