@@ -1,0 +1,23 @@
+# Versions used to produce every result in reports/ (Python 3.11.9, Windows 11).
+# torch was the CUDA 12.6 build; the CPU build gives the same tabular results.
+numpy==1.26.4
+pandas==2.3.3
+pyarrow==22.0.0
+scipy==1.15.2
+scikit-learn==1.6.1
+xgboost==3.0.0
+torch==2.8.0
+shap==0.48.0
+lifelines==0.30.3
+matplotlib==3.10.0
+pydicom==3.0.2
+SimpleITK==2.5.6
+nibabel==5.4.2
+sentence-transformers==6.1.0
+transformers==5.17.0
+requests==2.34.2
+streamlit==1.44.1
+fastapi==0.116.1
+uvicorn==0.35.0
+pydantic==2.6.0
+jupyter==1.1.1
