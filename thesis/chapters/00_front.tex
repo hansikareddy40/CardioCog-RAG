@@ -70,17 +70,28 @@ XGBoost & -- & Extreme Gradient Boosting \\
 \begin{tabular}{@{}lcl@{}}
 $\mathbf{x}_{t_0}$ & -- & Feature vector at the index visit \\
 $t_0$ & -- & Date of the index visit \\
-$y$ & -- & Outcome: dementia diagnosis within three years (1) or not (0) \\
+$y$, $y_{\text{dec}}$ & -- & Dementia and CDR-SB decline outcomes within three years \\
+$\Delta$, $\hat{\Delta}$ & -- & Observed and predicted three-year change in CDR-SB \\
 $\hat{p}$ & -- & Predicted probability of the outcome \\
-$s$ & -- & Raw neuropsychological test score \\
-$\hat{s}$ & -- & Expected test score of a cognitively normal person \\
+$\sigma(\cdot)$ & -- & Logistic function, $1/(1+e^{-u})$ \\
+$s$, $\hat{s}$ & -- & Raw test score and expected score of a cognitively normal person \\
 $\sigma_{\text{res}}$ & -- & Residual standard deviation of the normative model \\
 $z$ & -- & Demographically adjusted test score \\
-$\beta_k$ & -- & Coefficients of the normative regression model \\
+$\beta_k$ & -- & Regression coefficients \\
+$C$ & -- & Inverse strength of the $L_2$ penalty in logistic regression \\
+$\eta$, $\lambda$ & -- & Learning rate and leaf-weight penalty of XGBoost \\
+$\mathbf{t}_g$, $\mathbf{m}_g$ & -- & Token and missing token of modality $g$ in the fusion network \\
+$\alpha_g$ & -- & Attention weight of modality $g$ \\
+$\rho(\cdot)$ & -- & Huber loss \\
+$\xi$ & -- & Modality-dropout indicator, Bernoulli(0.35) \\
 $\phi_j$ & -- & SHAP contribution of feature $j$ \\
 $\Delta$AUROC & -- & Paired difference in AUROC between two models \\
-$p_{\text{drop}}$ & -- & Probability of removing a category in modality dropout \\
 $B$ & -- & Brier score \\
+$\text{NB}(t)$ & -- & Net benefit at risk threshold $t$ \\
+$\hat{S}(t)$, $h(t)$ & -- & Kaplan--Meier survival estimate and hazard function \\
+$V(\mathbf{r})$ & -- & PET activity at voxel $\mathbf{r}$ \\
+SUVR & -- & Standardised uptake value ratio \\
+MI & -- & Mutual information between two images \\
 \end{tabular}
 \end{center}
 

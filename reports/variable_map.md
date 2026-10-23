@@ -17,7 +17,7 @@ Roles: **predictor** = candidate input; **outcome** = what we may predict (a fut
 | `NACCVNUM` | Visit number in order (1 = first) | time | derived | count | structure |  | -4 | 100.0% | 100.0% |
 | `NACCAVST` | Total number of visits this participant has | time | derived | count | structure |  | -4 | 100.0% | 100.0% |
 | `NACCFDYS` | Days from first visit to this visit | time | derived | continuous | structure |  | -4 | 100.0% | 100.0% |
-| `PACKET` | Visit type | form | header | categorical | structure | I initial, F follow-up, T telephone follow-up, IT initial by telephone, I4 initial under UDS v4 | -4 | 0.0% | 0.0% |
+| `PACKET` | Visit type | form | header | categorical | structure | I initial, F follow-up, T telephone follow-up, IT initial by telephone, I4 initial under UDS v4 | -4 | 100.0% | 100.0% |
 | `FORMVER` | UDS form version (1, 2, 3, 3.2, 4) | form | header | categorical | structure |  | -4 | 100.0% | 100.0% |
 | `NACCDIED` | Participant known to have died | status | derived | categorical | context | 0 no, 1 yes | -4 | 100.0% | 100.0% |
 | `NACCACTV` | Follow-up status at the centre | status | derived | categorical | context |  | -4 | 100.0% | 100.0% |

@@ -43,7 +43,15 @@ Twenty-eight automated checks test the deployed model through the same code path
 
 \section{Evidence assistant}
 
-The evidence assistant is a retrieval-augmented generation system \cite{lewis2020}. Its library consists of eleven open-access papers on dementia risk factors, vascular contributions, APOE, amyloid and tau PET and diagnostic criteria, divided into 447 passages. For a question, two rankings are computed, one by semantic similarity of sentence embeddings \cite{reimers2019} and one by BM25 keyword relevance \cite{robertson2009}, and merged by reciprocal rank fusion \cite{cormack2009}. If the best semantic similarity is below a fixed threshold (0.35), the assistant reports that the library contains no evidence on the question. Otherwise a small instruction-tuned language model running locally writes an answer from the retrieved passages with numbered citations; if the answer does not cite the passages correctly, the assistant quotes them directly instead. Questions asking for advice about a particular person are answered with a notice that the system cannot give individual medical advice, followed by general published information only. No data leave the machine.
+The evidence assistant is a retrieval-augmented generation system \cite{lewis2020}. Its library consists of eleven open-access papers on dementia risk factors, vascular contributions, APOE, amyloid and tau PET and diagnostic criteria, divided into 447 passages. For a question, two rankings are computed, one by semantic similarity of sentence embeddings \cite{reimers2019} and one by BM25 keyword relevance \cite{robertson2009}, and merged by reciprocal rank fusion \cite{cormack2009}. For a question $q$ and passage $d$, the semantic score is the cosine similarity of the normalised embeddings, $s_{\text{sem}}(q, d) = \mathbf{e}_q^{\top}\mathbf{e}_d$, and the keyword score is
+\begin{equation}
+s_{\text{BM25}}(q, d) = \sum_{w \in q} \operatorname{IDF}(w) \frac{f(w, d)\,(k_1 + 1)}{f(w, d) + k_1 \big(1 - b + b\, |d| / \overline{|d|}\big)}, \qquad k_1 = 1.5,\ b = 0.75,
+\end{equation}
+where $f(w, d)$ is the number of times word $w$ occurs in $d$, $|d|$ the passage length and $\overline{|d|}$ the average length. If $\rho_{\text{sem}}(d)$ and $\rho_{\text{BM25}}(d)$ are the ranks of $d$ under the two scores, the passages are ordered by
+\begin{equation}
+s_{\text{RRF}}(d) = \frac{1}{60 + \rho_{\text{sem}}(d)} + \frac{1}{60 + \rho_{\text{BM25}}(d)},
+\end{equation}
+which rewards passages ranked well by either method without having to put the two scores on a common scale. If the best semantic similarity is below a fixed threshold, $\max_d s_{\text{sem}}(q, d) < 0.35$, the assistant reports that the library contains no evidence on the question. Otherwise a small instruction-tuned language model running locally writes an answer from the retrieved passages with numbered citations; if the answer does not cite the passages correctly, the assistant quotes them directly instead. Questions asking for advice about a particular person are answered with a notice that the system cannot give individual medical advice, followed by general published information only. No data leave the machine.
 
 \begin{table}[H]
 \centering\small
@@ -62,5 +70,13 @@ Answers written with valid citations by the language model & 22\% (otherwise quo
 \bottomrule
 \end{tabular}
 \end{table}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.75\textwidth]{12_retrieval.png}
+\caption{Share of the 32 in-scope questions for which the top-ranked passage came from an expected source, for keyword retrieval, embedding retrieval and the hybrid.}
+\label{fig:retrieval}
+\end{figure}
 
 These results should be read with care. The library is small and the test questions were written by the project team, so retrieval is an easy test. The local language model is small and produced a properly cited answer for only about one question in five; direct quotation is the fallback and is the safer behaviour for medical content.

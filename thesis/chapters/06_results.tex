@@ -29,14 +29,14 @@ The five models perform almost identically, and their confidence intervals overl
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{06_model_comparison.png}
-\caption{AUROC and AUPRC of the five models on the test set and the held-out centres.}
+\caption{AUROC with 95\% bootstrap intervals of the five models on the test set and the held-out centres (labelled ``external set'').}
 \label{fig:models}
 \end{figure}
 
 \section{Performance by diagnosis at the index visit}
 \label{sec:res_groups}
 
-The cohort combines cognitively normal participants, who rarely convert (1.6\%), with participants with MCI, who often do (41.5\%). Diagnosis alone therefore separates converters from non-converters well: a model given only the diagnosis reaches an AUROC of 0.84. Table~\ref{tab:groups} reports XGBoost separately within each group.
+The cohort combines cognitively normal participants, who rarely convert (1.6\%), with participants with MCI, who often do (41.5\%). Diagnosis alone therefore separates converters from non-converters well: a model given only the diagnosis reaches an AUROC of 0.84. Table~\ref{tab:groups} reports XGBoost separately within each group. The ablation, subgroup and missing-information analyses retrained XGBoost in separate runs, which give 0.937 for the whole test set instead of the 0.938 of Table~\ref{tab:models_res}; the difference of 0.0004 reflects the separate training runs and is far smaller than the confidence intervals.
 
 \begin{table}[H]
 \centering\small
@@ -111,7 +111,22 @@ Genetics & 3.5\% \\
 \end{tabular}
 \end{table}
 
-The most important individual features were CDR-SB, MCI status, the memory score, age and the executive score. The ranking was stable across eight bootstrap refits (Spearman correlation with the main model 0.89 to 0.97; 8 to 10 of the top ten features shared). Some associations are not causal: lower BMI was associated with higher predicted risk, which is consistent with weight loss in the years before a dementia diagnosis rather than a protective effect of higher weight.
+The most important individual features were CDR-SB, MCI status, the memory score, age and the executive score. The ranking was stable across eight bootstrap refits (Spearman correlation with the main model 0.89 to 0.97; 8 to 10 of the top ten features shared). Some associations are not causal: lower BMI was associated with higher predicted risk, which is consistent with weight loss in the years before a dementia diagnosis rather than a protective effect of higher weight. The shares were similar within each diagnostic group (clinical stage 42\% and 39\%, cognitive tests 34\% and 37\% in normal and MCI participants; Figure~\ref{fig:shapdx}).
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{07_shap_features.png}
+\caption{The fifteen features with the largest mean absolute SHAP value on the test set, coloured by category. The grey text gives the range of each feature's rank over eight models retrained on bootstrap samples.}
+\label{fig:shapfeat}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{07_shap_groups_by_dx.png}
+\caption{Share of SHAP importance by category within cognitively normal participants and participants with MCI at the index visit.}
+\label{fig:shapdx}
+\end{figure}
+
 
 \section{Cognitive Decline as the Outcome}
 
@@ -134,21 +149,45 @@ MCI & 766 / 399 & 0.748 (0.712--0.779) & 1,411 / 774 & 0.749 (0.723--0.776) \\
 \end{tabular}
 \end{table}
 
-Decline is harder to predict than dementia, as expected for an outcome that includes small changes in a rating scale. The cognitively normal group is much better represented here (129 and 215 events instead of 24 and 37), so the estimate of 0.76 to 0.83 in that group is more reliable than the corresponding dementia result. Logistic regression gave almost the same result (0.854 and 0.883). The pattern of contributions matched the dementia outcome: cognitive tests made the largest unique contribution ($+0.029$ on the test set), and the cardiovascular category added nothing measurable ($+0.0004$, interval $-0.003$ to $+0.003$; held-out centres $0.000$).
+Figure~\ref{fig:decline} compares the two outcomes. Decline is harder to predict than dementia, as expected for an outcome that includes small changes in a rating scale. The cognitively normal group is much better represented here (129 and 215 events instead of 24 and 37), so the estimate of 0.76 to 0.83 in that group is more reliable than the corresponding dementia result. Logistic regression gave almost the same result (0.854 and 0.883). The pattern of contributions matched the dementia outcome: cognitive tests made the largest unique contribution ($+0.029$ on the test set), and the cardiovascular category added nothing measurable ($+0.0004$, interval $-0.003$ to $+0.003$; held-out centres $0.000$).
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{decline_vs_dementia.png}
+\caption{AUROC with 95\% intervals of XGBoost for dementia within three years and for a rise of at least one point in CDR-SB within three years, by diagnosis at the index visit.}
+\label{fig:decline}
+\end{figure}
+
 
 \subsection{Predicted Change in CDR-SB}
 
-For the 1,863 test participants and 3,231 held-out participants with a visit near the three-year mark, the mean change in CDR-SB was 0.48 and 0.63 points, and three quarters showed no change or an improvement. The regression model reduced the mean absolute error from 0.69 (predicting no change) to 0.60 on the test set and from 0.83 to 0.72 at the held-out centres, with $R^2$ of 0.23 and 0.18 and a Spearman correlation of 0.45. Within MCI the error fell from 1.90 to 1.59 points. Within cognitively normal participants, whose scores rarely change, the model was no better than predicting no change (0.17 against 0.17). The progression estimate is therefore informative for people who are already impaired and adds little for people who are not.
+For the 1,863 test participants and 3,231 held-out participants with a visit near the three-year mark, the mean change in CDR-SB was 0.48 and 0.63 points, and 75\% and 70\% showed no change or an improvement. The regression model reduced the mean absolute error from 0.69 (predicting no change) to 0.60 on the test set and from 0.82 to 0.72 at the held-out centres, with $R^2$ of 0.23 and 0.18 and a Spearman correlation of 0.45 on both sets (Figure~\ref{fig:progerr}). Within MCI the error fell from 1.90 to 1.59 points on the test set and from 1.97 to 1.65 at the held-out centres. Within cognitively normal participants, whose scores rarely change, the model was no better than predicting no change (0.17 against 0.17 on the test set, 0.26 against 0.27 at the held-out centres). The progression estimate is therefore informative for people who are already impaired and adds little for people who are not.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{progression_error.png}
+\caption{Mean absolute error of the predicted three-year change in CDR-SB, against the reference of predicting no change, by diagnosis at the index visit.}
+\label{fig:progerr}
+\end{figure}
+
 
 \section{Modality-Encoder Fusion Network}
 
 The fusion network reached an AUROC of 0.934 (0.920--0.946) on the test set and 0.943 (0.935--0.951) at the held-out centres for dementia, against 0.937 and 0.946 for XGBoost; within MCI 0.831 and 0.837, and within cognitively normal participants 0.846 and 0.874. Its progression head reduced the mean absolute error from 0.72 to 0.65 on the test set. With modalities removed it behaved like the modality-dropout XGBoost model: without any cognitive information its AUROC was 0.72 and its Brier score 0.114, close to the specialist value.
 
-The attention weights, intended as an explanation of how much the network relied on each modality, were nearly equal: between 18\% and 21\% for every modality, on both evaluation sets and in every diagnostic group. They stayed almost equal even when the cognitive modalities were missing, because the learned missing tokens themselves carry the information. The attention weights therefore do not reveal which modality drives a prediction, in line with the wider observation that attention weights are not reliable explanations. The ablation results and SHAP values, which show that cognitive information dominates, remain the explanations used in this work. The fusion network demonstrates that the proposed architecture works and copes with missing modalities, but it offers no gain in accuracy over gradient-boosted trees on these data.
+The attention weights, intended as an explanation of how much the network relied on each modality, were nearly equal: between 18\% and 22\% for every modality, on both evaluation sets and in every diagnostic group, against 20\% for perfectly uniform attention (Figure~\ref{fig:attn}). They stayed almost equal even when the cognitive modalities were missing, because the learned missing tokens themselves carry the information. The attention weights therefore do not reveal which modality drives a prediction, in line with the wider observation that attention weights are not reliable explanations. The ablation results and SHAP values, which show that cognitive information dominates, remain the explanations used in this work. The fusion network demonstrates that the proposed architecture works and copes with missing modalities, but it offers no gain in accuracy over gradient-boosted trees on these data.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{fusion_attention.png}
+\caption{Mean attention share of each modality in the fusion network, by evaluation set and diagnosis at the index visit. The dashed line marks uniform attention (20\%).}
+\label{fig:attn}
+\end{figure}
+
 
 \section{Longitudinal information}
 
-On landmark visits preceded by at least two earlier visits (test: 1,205 participants, 166 events; held-out centres: 2,254 participants, 326 events), adding the visit history produced only small changes (Table~\ref{tab:long}).
+On landmark visits preceded by at least two earlier visits (test: 1,205 participants, 166 events; held-out centres: 2,254 participants, 326 events), adding the visit history produced only small changes (Table~\ref{tab:long}, Figure~\ref{fig:long}).
 
 \begin{table}[H]
 \centering\small
@@ -166,12 +205,35 @@ GRU over the visit sequence & 0.920 ($+0.000$; $-0.011$ to $+0.010$) & 0.958 ($+
 \end{tabular}
 \end{table}
 
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{06_longitudinal.png}
+\caption{AUROC with 95\% intervals of the three longitudinal models on landmark visits.}
+\label{fig:long}
+\end{figure}
+
 When current scores are known, the path that led to them adds little for a three-year prediction. This does not show that longitudinal modelling is of no value; a longer horizon, an earlier disease stage or more frequent measurement could give a different result.
 
 \section{PET measures (research question 3)}
 \label{sec:res_pet}
 
-On its own, amyloid status is strongly associated with progression: among participants with MCI in the held-out sets, about 34\% of amyloid-positive participants received a dementia diagnosis within two years, compared with about 7\% of amyloid-negative participants (36\% and 9\% under the strict scan-matching rule). Added to the clinical model, however, the PET measures did not produce a clear improvement under either matching rule. For example, with strict matching and a three-year horizon, the AUROC at the held-out centres was 0.939 without and 0.946 with amyloid (191 participants, 27 events; paired gain $-0.007$ to $+0.024$). The final late-fusion model scored 0.964 against 0.944 for the clinical model on 243 held-out scanned participants with 33 events, a gain of 0.020 whose interval ($-0.009$ to $+0.066$) includes zero. A modest benefit cannot be excluded, but it could not be demonstrated with the follow-up currently available.
+On its own, amyloid status is strongly associated with progression: among participants with MCI in the held-out sets, about 34\% of amyloid-positive participants received a dementia diagnosis within two years, compared with about 7\% of amyloid-negative participants (36\% and 9\% under the strict scan-matching rule; Figure~\ref{fig:amyconv}). Added to the clinical model, however, the PET measures did not produce a clear improvement under either matching rule. For example, with strict matching and a three-year horizon, the AUROC at the held-out centres was 0.939 without and 0.946 with amyloid (191 participants, 27 events; paired gain $-0.007$ to $+0.024$). The final late-fusion model scored 0.964 against 0.944 for the clinical model on 243 held-out scanned participants with 33 events, a gain of 0.020 whose interval ($-0.009$ to $+0.066$) includes zero. Figure~\ref{fig:petgain} shows the gain for both matching rules and horizons with the test set and held-out centres pooled; every interval includes zero. A modest benefit cannot be excluded, but it could not be demonstrated with the follow-up currently available.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{08_conversion_by_amyloid.png}
+\caption{Percentage of participants with MCI at the index visit who converted to dementia within two and three years, by amyloid status, under the strict and nearest scan-matching rules (test set and held-out centres).}
+\label{fig:amyconv}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{08_pet_gain.png}
+\caption{Change in AUROC when PET measures are added to the clinical model, with 95\% intervals, test set and held-out centres pooled. The number of events is given for each comparison.}
+\label{fig:petgain}
+\end{figure}
+
 
 \section{Validation}
 
@@ -200,11 +262,34 @@ APOE $\varepsilon$4 carrier & 0.915 (762 / 150) & 0.933 (1,402 / 277) \\
 \end{tabular}
 \end{table}
 
-Discrimination was similar across sex, race and education. It was lower in the oldest participants and in APOE $\varepsilon$4 carriers, both groups with a higher baseline risk.
+Discrimination was similar across sex, race and education (Figure~\ref{fig:subgroups}). It was lower in the oldest participants and in APOE $\varepsilon$4 carriers, both groups with a higher baseline risk.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{09_subgroups.png}
+\caption{XGBoost AUROC with 95\% intervals by subgroup on the test set and the held-out centres (``external set'').}
+\label{fig:subgroups}
+\end{figure}
+
 
 \subsection{Calibration and clinical usefulness}
 
-On the test set the mean predicted risk (14.5\%) equalled the observed rate (14.5\%), with a calibration slope of 1.01 and intercept of 0.009. At the held-out centres the model over-predicted slightly (15.0\% predicted, 13.4\% observed; slope 1.10). Using a risk threshold of 20\%, the model flagged 22\% of test participants with a sensitivity of 83\%, specificity of 88\%, positive predictive value of 55\% and negative predictive value of 97\% (held-out centres: 90\%, 87\%, 52\% and 98\%). Decision curve analysis showed a higher net benefit than treating everyone or no one across all thresholds examined, from 2\% to 60\%, on both evaluation sets.
+On the test set the mean predicted risk (14.5\%) equalled the observed rate (14.5\%), with a calibration slope of 1.01 and intercept of 0.009. At the held-out centres the model over-predicted slightly (15.0\% predicted, 13.4\% observed; slope 1.10), as the calibration curves in Figure~\ref{fig:calib} show. Using a risk threshold of 20\%, the model flagged 22\% of test participants with a sensitivity of 83\%, specificity of 88\%, positive predictive value of 55\% and negative predictive value of 97\% (held-out centres: 90\%, 87\%, 52\% and 98\%). Decision curve analysis showed a higher net benefit than treating everyone or no one across all thresholds examined, from 2\% to 60\%, on both evaluation sets (Figure~\ref{fig:dca}).
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{06_calibration.png}
+\caption{Calibration of XGBoost: observed share converting against mean predicted risk in groups of participants, on the test set and the held-out centres.}
+\label{fig:calib}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{09_decision_curve.png}
+\caption{Decision curves: net benefit of acting on the model's prediction, of acting on everyone and of acting on no one, across risk thresholds.}
+\label{fig:dca}
+\end{figure}
+
 
 \section{Missing information}
 
@@ -225,12 +310,28 @@ Demographics only & 0.444 & 0.120 & 0.118 \\
 \end{tabular}
 \end{table}
 
-A standard model given missing inputs at prediction time produced badly calibrated risks when cognitive information was absent, worse than predicting the base rate (Brier 0.124). The model trained with modality dropout stayed close to a specialist model retrained for each situation (Table~\ref{tab:dropout}), with almost no loss when all information is present. This model is used in the clinician interface.
+A standard model given missing inputs at prediction time produced badly calibrated risks when cognitive information was absent, worse than predicting the base rate (Brier 0.124). The model trained with modality dropout stayed close to a specialist model retrained for each situation (Table~\ref{tab:dropout}), with almost no loss when all information is present (Figure~\ref{fig:missing}). This model is used in the clinician interface.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{10_missing_modalities.png}
+\caption{AUROC and Brier score on the test set when categories of information are missing, for the standard model, the modality-dropout model and a specialist model retrained for each pattern.}
+\label{fig:missing}
+\end{figure}
+
 
 \section{Sensitivity analyses}
 \label{sec:res_sens}
 
-\textbf{Censored participants.} A Cox model fitted on all eligible participants, including those followed for less than three years, reached a concordance index of 0.891 on the test set and 0.903 at the held-out centres. Removing the cardiovascular category changed the concordance by 0.001 ($-0.001$ to $0.003$) and 0.000 ($-0.001$ to $0.002$). Hazard ratios per standard deviation were 1.37 for CDR-SB, 0.76 for the memory score, 1.40 for age and 1.20 for each APOE $\varepsilon$4 allele, while hypertension (0.995, 0.953--1.038), diabetes and stroke had hazard ratios close to one.
+\textbf{Censored participants.} A Cox model fitted on all eligible participants, including those followed for less than three years, reached a concordance index of 0.891 on the test set and 0.903 at the held-out centres. Removing the cardiovascular category changed the concordance by 0.001 ($-0.001$ to $0.003$) and 0.000 ($-0.001$ to $0.002$). Hazard ratios per standard deviation were 1.37 for CDR-SB, 0.76 for the memory score, 1.40 for age and 1.20 for the APOE $\varepsilon$4 count, while hypertension (0.995, 0.953--1.038), diabetes, stroke and systolic blood pressure had hazard ratios close to one (Figure~\ref{fig:hr}).
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{09_hazard_ratios.png}
+\caption{Hazard ratios per standard deviation with 95\% intervals from the Cox model, adjusted for all other features. Cardiovascular and medical features are shown in red.}
+\label{fig:hr}
+\end{figure}
+
 
 \textbf{Reversed diagnoses.} A clinical diagnosis can be revised. Of the 2,818 converters, 217 (7.7\%) were recorded as not demented at a later visit. Excluding them, XGBoost reached an AUROC of 0.947 on the test set and 0.950 at the held-out centres (MCI: 0.839 and 0.851). The conclusions do not depend on reversed diagnoses.
 
