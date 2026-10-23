@@ -198,15 +198,33 @@ def predict(e: Entries):
 _assistant = None
 
 
-@app.post("/api/ask")
-def ask(q: Question):
+def assistant():
     global _assistant
     import rag
-    if not (rag.STORE / "passages.json").exists():
-        return {"answer": "The evidence library has not been built yet. Run python scripts/rag_build.py.", "mode": "unavailable", "sources": []}
-    if _assistant is None:
+    if _assistant is None and (rag.STORE / "passages.json").exists():
         _assistant = rag.Assistant()
-    out = _assistant.ask(q.question, model_context=q.context)
+    return _assistant
+
+
+@app.post("/api/report")
+def report(e: Entries):
+    """Plain-language report: risk, reasons, reliability and quoted evidence."""
+    from report import build_report
+    x = to_model_input(e.values, e.on)
+    res = P.predict(x)
+    a = assistant()
+    used = [GROUP_NAMES[g] for g in P.meta["feature_groups"] if g not in res["missing_groups"]]
+    missing = [GROUP_NAMES[g] for g in res["missing_groups"]]
+    return build_report(res, P.check_inputs(x, res["features"]), P.similar_participants(x), used, missing,
+                        library=None if a is None else a.library)
+
+
+@app.post("/api/ask")
+def ask(q: Question):
+    a = assistant()
+    if a is None:
+        return {"answer": "The evidence library has not been built yet. Run python scripts/rag_build.py.", "mode": "unavailable", "sources": []}
+    out = a.ask(q.question, model_context=q.context)
     return {"answer": out["answer"], "mode": out["mode"],
             "sources": [{k: s[k] for k in ("n", "short", "year", "section", "title", "url", "passage")} for s in out["sources"]]}
 

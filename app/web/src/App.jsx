@@ -201,6 +201,46 @@ function Result({ res }) {
   );
 }
 
+function Report({ values, on }) {
+  const [rep, setRep] = useState(null);
+  const [busy, setBusy] = useState(false);
+  useEffect(() => { setRep(null); }, [values, on]);
+  const make = async () => {
+    setBusy(true);
+    try { setRep(await post("/api/report", { values, on })); } catch (err) { setRep({ error: String(err) }); }
+    setBusy(false);
+  };
+  return (
+    <div className="report">
+      <button className="primary" onClick={make} disabled={busy}>{busy ? "Writing report" : "Create plain-language report"}</button>
+      {rep && !rep.error && (
+        <div className="report-body">
+          <h3>Summary</h3>
+          <p>{rep.summary}</p>
+          <h3>Main reasons</h3>
+          {rep.reasons.map((r, i) => <p key={i}>{r}</p>)}
+          <h3>Reliability</h3>
+          {rep.reliability.map((r, i) => <p key={i}>{r}</p>)}
+          {rep.evidence.length > 0 && (
+            <>
+              <h3>Published evidence</h3>
+              {rep.evidence.map((e, i) => (
+                <blockquote key={i}>
+                  &ldquo;{e.quote}&rdquo;
+                  <br />
+                  <a href={e.url} target="_blank" rel="noreferrer">{e.source}</a>
+                </blockquote>
+              ))}
+            </>
+          )}
+          <p className="note">{rep.limits}</p>
+        </div>
+      )}
+      {rep && rep.error && <div className="alert stop">{rep.error}</div>}
+    </div>
+  );
+}
+
 function Evidence({ context }) {
   const [q, setQ] = useState("");
   const [out, setOut] = useState(null);
@@ -308,6 +348,7 @@ export default function App() {
             {!ready && <div className="alert warn">Enter age and years of education.</div>}
             {error && <div className="alert stop">{error}</div>}
             {ready && res && <Result res={res} />}
+            {ready && res && <Report values={values} on={on} />}
           </div>
         </aside>
       </div>

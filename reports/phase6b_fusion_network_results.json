@@ -1,0 +1,541 @@
+{
+ "design": {
+  "modalities": [
+   "Demographics",
+   "Genetics / APOE",
+   "Cardiovascular / medical",
+   "Cognitive tests",
+   "Clinical stage (CDR-SB, diagnosis)"
+  ],
+  "token_dim": 32,
+  "attention_heads": 4,
+  "modality_dropout": 0.35,
+  "heads": [
+   "risk (dementia within 3 years)",
+   "progression (3-year change in CDR-SB)"
+  ],
+  "seeds": 3
+ },
+ "risk": {
+  "test": {
+   "All non-demented": {
+    "n": 2286,
+    "events": 332,
+    "auroc": 0.9335730845593223,
+    "auprc": 0.7125238770754195,
+    "brier": 0.06748292423147884,
+    "auroc_ci": [
+     0.9200378907592913,
+     0.9458545584644349
+    ],
+    "auprc_ci": [
+     0.6665167160811825,
+     0.762506303560248
+    ],
+    "brier_ci": [
+     0.06127952924243903,
+     0.07456236636424232
+    ]
+   },
+   "Cognitively normal": {
+    "n": 1411,
+    "events": 24,
+    "auroc": 0.8462509012256669,
+    "auprc": 0.1404324866162503,
+    "brier": 0.015760277128736275,
+    "auroc_ci": [
+     0.7657954346044799,
+     0.9157011545221021
+    ],
+    "auprc_ci": [
+     0.07282255808671748,
+     0.284042569125508
+    ],
+    "brier_ci": [
+     0.010115536455181557,
+     0.021977549221305622
+    ]
+   },
+   "MCI": {
+    "n": 732,
+    "events": 289,
+    "auroc": 0.8309497215431121,
+    "auprc": 0.7510037097153852,
+    "brier": 0.1644676061295037,
+    "auroc_ci": [
+     0.8023502723851546,
+     0.8604545290274148
+    ],
+    "auprc_ci": [
+     0.6977912611240639,
+     0.8043227424853043
+    ],
+    "brier_ci": [
+     0.15055964683660383,
+     0.1790685441240461
+    ]
+   }
+  },
+  "external": {
+   "All non-demented": {
+    "n": 4064,
+    "events": 545,
+    "auroc": 0.942675541164478,
+    "auprc": 0.7187806371365274,
+    "brier": 0.06174245758901059,
+    "auroc_ci": [
+     0.9349780707273997,
+     0.9510750750620199
+    ],
+    "auprc_ci": [
+     0.6816642680761391,
+     0.7618047190377571
+    ],
+    "brier_ci": [
+     0.05718612399822688,
+     0.06610378362407927
+    ]
+   },
+   "Cognitively normal": {
+    "n": 2624,
+    "events": 37,
+    "auroc": 0.8736196575392555,
+    "auprc": 0.15705735735957618,
+    "brier": 0.013171517012565625,
+    "auroc_ci": [
+     0.8107133066713742,
+     0.9197544634352508
+    ],
+    "auprc_ci": [
+     0.07141077752113806,
+     0.27375493510067667
+    ],
+    "brier_ci": [
+     0.00947522424447656,
+     0.017202957588575537
+    ]
+   },
+   "MCI": {
+    "n": 1291,
+    "events": 496,
+    "auroc": 0.8368812132278352,
+    "auprc": 0.7500047971394723,
+    "brier": 0.16246485186080778,
+    "auroc_ci": [
+     0.8136391188532348,
+     0.8591579148559647
+    ],
+    "auprc_ci": [
+     0.7107426755443573,
+     0.7889387529762529
+    ],
+    "brier_ci": [
+     0.15225679085872101,
+     0.17333106296729717
+    ]
+   }
+  }
+ },
+ "missing_patterns": {
+  "test": {
+   "Everything": {
+    "n": 2286,
+    "events": 332,
+    "auroc": 0.9335730845593223,
+    "auprc": 0.7125238770754195,
+    "brier": 0.06748292423147884,
+    "auroc_ci": [
+     0.9199022628989679,
+     0.9467329647902694
+    ],
+    "auprc_ci": [
+     0.6679091594088563,
+     0.7622308626611525
+    ],
+    "brier_ci": [
+     0.06098567984131336,
+     0.07456236636424232
+    ],
+    "attention_share": {
+     "Demographics": 0.19990000128746033,
+     "Genetics / APOE": 0.18379999697208405,
+     "Cardiovascular / medical": 0.19290000200271606,
+     "Cognitive tests": 0.2142000049352646,
+     "Clinical stage (CDR-SB, diagnosis)": 0.2092999964952469
+    }
+   },
+   "No cardiovascular data": {
+    "n": 2286,
+    "events": 332,
+    "auroc": 0.932569582321096,
+    "auprc": 0.7114969357597588,
+    "brier": 0.06780911130442721,
+    "auroc_ci": [
+     0.919047455168721,
+     0.9458825809878254
+    ],
+    "auprc_ci": [
+     0.6645441889600658,
+     0.7621699220775737
+    ],
+    "brier_ci": [
+     0.06162541912684143,
+     0.07499827702855062
+    ],
+    "attention_share": {
+     "Demographics": 0.19709999859333038,
+     "Genetics / APOE": 0.18129999935626984,
+     "Cardiovascular / medical": 0.20399999618530273,
+     "Cognitive tests": 0.21130000054836273,
+     "Clinical stage (CDR-SB, diagnosis)": 0.20630000531673431
+    }
+   },
+   "No cognitive tests": {
+    "n": 2286,
+    "events": 332,
+    "auroc": 0.914711558619329,
+    "auprc": 0.6214114291585714,
+    "brier": 0.07709201174266114,
+    "auroc_ci": [
+     0.8998165353163106,
+     0.9283603255120063
+    ],
+    "auprc_ci": [
+     0.5744707443477168,
+     0.6774660064267438
+    ],
+    "brier_ci": [
+     0.07040471226859416,
+     0.08465866665520241
+    ],
+    "attention_share": {
+     "Demographics": 0.2011999934911728,
+     "Genetics / APOE": 0.1850000023841858,
+     "Cardiovascular / medical": 0.19419999420642853,
+     "Cognitive tests": 0.20900000631809235,
+     "Clinical stage (CDR-SB, diagnosis)": 0.21080000698566437
+    }
+   },
+   "No clinical stage": {
+    "n": 2286,
+    "events": 332,
+    "auroc": 0.915937033702877,
+    "auprc": 0.6587096774376552,
+    "brier": 0.07510299009579219,
+    "auroc_ci": [
+     0.8999378115530707,
+     0.9296910771822038
+    ],
+    "auprc_ci": [
+     0.6083367357676234,
+     0.7119136226305174
+    ],
+    "brier_ci": [
+     0.06717296269073465,
+     0.08268021842838406
+    ],
+    "attention_share": {
+     "Demographics": 0.20029999315738678,
+     "Genetics / APOE": 0.1843000054359436,
+     "Cardiovascular / medical": 0.19329999387264252,
+     "Cognitive tests": 0.21480000019073486,
+     "Clinical stage (CDR-SB, diagnosis)": 0.20720000565052032
+    }
+   },
+   "No cognitive information at all": {
+    "n": 2286,
+    "events": 332,
+    "auroc": 0.7197600535201194,
+    "auprc": 0.30207158780331755,
+    "brier": 0.11408754716049317,
+    "auroc_ci": [
+     0.6890770467423308,
+     0.7498495158481799
+    ],
+    "auprc_ci": [
+     0.25798273639758906,
+     0.35201174903485655
+    ],
+    "brier_ci": [
+     0.10589215039854366,
+     0.12390200541422258
+    ],
+    "attention_share": {
+     "Demographics": 0.20170000195503235,
+     "Genetics / APOE": 0.18549999594688416,
+     "Cardiovascular / medical": 0.19470000267028809,
+     "Cognitive tests": 0.2094999998807907,
+     "Clinical stage (CDR-SB, diagnosis)": 0.2085999995470047
+    }
+   },
+   "Demographics only": {
+    "n": 2286,
+    "events": 332,
+    "auroc": 0.6476265861809571,
+    "auprc": 0.2215075944839759,
+    "brier": 0.12063040159001884,
+    "auroc_ci": [
+     0.6183051422996497,
+     0.6836728943529448
+    ],
+    "auprc_ci": [
+     0.19382953755234544,
+     0.25926680511707717
+    ],
+    "brier_ci": [
+     0.11180115572900556,
+     0.1305357209011274
+    ],
+    "attention_share": {
+     "Demographics": 0.19470000267028809,
+     "Genetics / APOE": 0.20059999823570251,
+     "Cardiovascular / medical": 0.2012999951839447,
+     "Cognitive tests": 0.2020999938249588,
+     "Clinical stage (CDR-SB, diagnosis)": 0.2012999951839447
+    }
+   }
+  },
+  "external": {
+   "Everything": {
+    "n": 4064,
+    "events": 545,
+    "auroc": 0.942675541164478,
+    "auprc": 0.7187806371365274,
+    "brier": 0.06174245758901059,
+    "auroc_ci": [
+     0.9350676951580665,
+     0.9519394442656226
+    ],
+    "auprc_ci": [
+     0.685978936845192,
+     0.7610046959795344
+    ],
+    "brier_ci": [
+     0.05686685270019121,
+     0.06612130317898639
+    ],
+    "attention_share": {
+     "Demographics": 0.1996999979019165,
+     "Genetics / APOE": 0.1850000023841858,
+     "Cardiovascular / medical": 0.19220000505447388,
+     "Cognitive tests": 0.21320000290870667,
+     "Clinical stage (CDR-SB, diagnosis)": 0.20990000665187836
+    }
+   },
+   "No cardiovascular data": {
+    "n": 4064,
+    "events": 545,
+    "auroc": 0.9415508471704067,
+    "auprc": 0.7173014111215394,
+    "brier": 0.0623906143859721,
+    "auroc_ci": [
+     0.9334478933977031,
+     0.9509394163797236
+    ],
+    "auprc_ci": [
+     0.6837294185839113,
+     0.7622225816415146
+    ],
+    "brier_ci": [
+     0.05739801834689245,
+     0.06682968784203501
+    ],
+    "attention_share": {
+     "Demographics": 0.19699999690055847,
+     "Genetics / APOE": 0.18240000307559967,
+     "Cardiovascular / medical": 0.20319999754428864,
+     "Cognitive tests": 0.2102999985218048,
+     "Clinical stage (CDR-SB, diagnosis)": 0.2070000022649765
+    }
+   },
+   "No cognitive tests": {
+    "n": 4064,
+    "events": 545,
+    "auroc": 0.9274074421684644,
+    "auprc": 0.6364382286042931,
+    "brier": 0.06880421074656498,
+    "auroc_ci": [
+     0.9182364421789259,
+     0.9388556948217557
+    ],
+    "auprc_ci": [
+     0.6011021949293514,
+     0.6830185728596614
+    ],
+    "brier_ci": [
+     0.063836449052542,
+     0.07291184308415809
+    ],
+    "attention_share": {
+     "Demographics": 0.20090000331401825,
+     "Genetics / APOE": 0.18610000610351562,
+     "Cardiovascular / medical": 0.19339999556541443,
+     "Cognitive tests": 0.20819999277591705,
+     "Clinical stage (CDR-SB, diagnosis)": 0.21140000224113464
+    }
+   },
+   "No clinical stage": {
+    "n": 4064,
+    "events": 545,
+    "auroc": 0.9226672506524217,
+    "auprc": 0.668355428788168,
+    "brier": 0.0698094790364299,
+    "auroc_ci": [
+     0.9141988483728032,
+     0.9323714501633211
+    ],
+    "auprc_ci": [
+     0.6354614107479726,
+     0.7150862184785199
+    ],
+    "brier_ci": [
+     0.0650829241138147,
+     0.07470644654202135
+    ],
+    "attention_share": {
+     "Demographics": 0.2003999948501587,
+     "Genetics / APOE": 0.18569999933242798,
+     "Cardiovascular / medical": 0.19290000200271606,
+     "Cognitive tests": 0.2142000049352646,
+     "Clinical stage (CDR-SB, diagnosis)": 0.20679999887943268
+    }
+   },
+   "No cognitive information at all": {
+    "n": 4064,
+    "events": 545,
+    "auroc": 0.7327931465100334,
+    "auprc": 0.2635834118233626,
+    "brier": 0.10811136256487058,
+    "auroc_ci": [
+     0.7144293501485508,
+     0.7536387791525169
+    ],
+    "auprc_ci": [
+     0.236454526445792,
+     0.29536287568874375
+    ],
+    "brier_ci": [
+     0.10243187039582148,
+     0.11416775580572053
+    ],
+    "attention_share": {
+     "Demographics": 0.20170000195503235,
+     "Genetics / APOE": 0.18690000474452972,
+     "Cardiovascular / medical": 0.19419999420642853,
+     "Cognitive tests": 0.20900000631809235,
+     "Clinical stage (CDR-SB, diagnosis)": 0.20810000598430634
+    }
+   },
+   "Demographics only": {
+    "n": 4064,
+    "events": 545,
+    "auroc": 0.6826587515740242,
+    "auprc": 0.23636350056251523,
+    "brier": 0.11162881521318363,
+    "auroc_ci": [
+     0.6607188768867581,
+     0.7067973652811247
+    ],
+    "auprc_ci": [
+     0.21121086122985208,
+     0.26292357632778196
+    ],
+    "brier_ci": [
+     0.10546588370342162,
+     0.11779914079664365
+    ],
+    "attention_share": {
+     "Demographics": 0.19509999454021454,
+     "Genetics / APOE": 0.2004999965429306,
+     "Cardiovascular / medical": 0.2011999934911728,
+     "Cognitive tests": 0.20200000703334808,
+     "Clinical stage (CDR-SB, diagnosis)": 0.2011999934911728
+    }
+   }
+  }
+ },
+ "attention_share": {
+  "test": {
+   "All non-demented": {
+    "Demographics": 0.19990000128746033,
+    "Genetics / APOE": 0.18379999697208405,
+    "Cardiovascular / medical": 0.19290000200271606,
+    "Cognitive tests": 0.2142000049352646,
+    "Clinical stage (CDR-SB, diagnosis)": 0.2092999964952469
+   },
+   "Cognitively normal": {
+    "Demographics": 0.1965000033378601,
+    "Genetics / APOE": 0.18209999799728394,
+    "Cardiovascular / medical": 0.18960000574588776,
+    "Cognitive tests": 0.21209999918937683,
+    "Clinical stage (CDR-SB, diagnosis)": 0.21960000693798065
+   },
+   "MCI": {
+    "Demographics": 0.20489999651908875,
+    "Genetics / APOE": 0.18559999763965607,
+    "Cardiovascular / medical": 0.19740000367164612,
+    "Cognitive tests": 0.21610000729560852,
+    "Clinical stage (CDR-SB, diagnosis)": 0.19609999656677246
+   }
+  },
+  "external": {
+   "All non-demented": {
+    "Demographics": 0.1996999979019165,
+    "Genetics / APOE": 0.1850000023841858,
+    "Cardiovascular / medical": 0.19220000505447388,
+    "Cognitive tests": 0.21320000290870667,
+    "Clinical stage (CDR-SB, diagnosis)": 0.20990000665187836
+   },
+   "Cognitively normal": {
+    "Demographics": 0.19619999825954437,
+    "Genetics / APOE": 0.18289999663829803,
+    "Cardiovascular / medical": 0.18950000405311584,
+    "Cognitive tests": 0.21230000257492065,
+    "Clinical stage (CDR-SB, diagnosis)": 0.219200000166893
+   },
+   "MCI": {
+    "Demographics": 0.20520000159740448,
+    "Genetics / APOE": 0.1882999986410141,
+    "Cardiovascular / medical": 0.19679999351501465,
+    "Cognitive tests": 0.21459999680519104,
+    "Clinical stage (CDR-SB, diagnosis)": 0.19509999454021454
+   }
+  }
+ },
+ "progression": {
+  "test": {
+   "All non-demented": {
+    "n": 1745,
+    "mae_model": 0.6475836634635925,
+    "mae_predict_no_change": 0.7174785137176514
+   },
+   "Cognitively normal": {
+    "n": 1147,
+    "mae_model": 0.21701377630233765,
+    "mae_predict_no_change": 0.1691368818283081
+   },
+   "MCI": {
+    "n": 487,
+    "mae_model": 1.6157119274139404,
+    "mae_predict_no_change": 1.9661190509796143
+   }
+  },
+  "external": {
+   "All non-demented": {
+    "n": 3022,
+    "mae_model": 0.7663771510124207,
+    "mae_predict_no_change": 0.8522501587867737
+   },
+   "Cognitively normal": {
+    "n": 1947,
+    "mae_model": 0.3057001829147339,
+    "mae_predict_no_change": 0.26656395196914673
+   },
+   "MCI": {
+    "n": 960,
+    "mae_model": 1.7074811458587646,
+    "mae_predict_no_change": 2.058333396911621
+   }
+  }
+ }
+}
