@@ -24,6 +24,10 @@ A participant last seen less than three years after the index visit without a de
 \label{fig:outcome}
 \end{figure}
 
+\subsection{Secondary outcomes: cognitive decline}
+
+Dementia is one end point of cognitive decline, but many people worsen without reaching it. Two further outcomes were therefore defined from the CDR Sum of Boxes, which is recorded at every visit in every form version. The binary decline outcome is a rise of at least one point in CDR-SB at any visit within three years of the index visit; it is unknown for participants who neither rose by a point nor were followed for three years. The continuous progression outcome is the change in CDR-SB between the index visit and the visit closest to three years later, accepted if that visit falls within six months of the three-year mark. The same eligibility rules and splits are used for all outcomes.
+
 \section{Cohort}
 
 Table~\ref{tab:flow} shows how the cohort was formed. Visits had to be in person and on form versions 1 to 3, because telephone and version~4 visits lack the neuropsychological tests. Participants with dementia at the index visit, or at any earlier visit, are not eligible.
@@ -133,7 +137,11 @@ FT-Transformer & Feature tokens of dimension 64, three Transformer layers with e
 \end{tabularx}
 \end{table}
 
-XGBoost was used as the main model for all further experiments because it performed as well as the others, handles missing values without imputation and allows exact Shapley value explanations.
+XGBoost was used as the main model for all further experiments because it performed as well as the others, handles missing values without imputation and allows exact Shapley value explanations. For the progression outcome, the same gradient-boosting settings were used with an absolute-error objective, and the model was compared with the simplest reference, predicting no change.
+
+\section{Modality-Encoder Fusion Network}
+
+To test the fusion architecture proposed at the start of the project, a neural network was built in which each of the five kinds of information has its own encoder. Each encoder is a two-layer network that maps the features of one modality to a 32-dimensional token. When a modality is entirely missing for a participant, its token is replaced by a learned ``missing'' token, so the network can tell an absent modality from a normal one. A learned type embedding identifies each modality. A four-head attention layer, queried by a learned summary vector, combines the five tokens into one representation (Tier~1 fusion), and the attention weights show how much the network drew on each modality. Two heads share this representation: a risk head for dementia within three years and a progression head for the three-year change in CDR-SB, trained jointly with a binary cross-entropy loss and a Huber loss weighted by 0.5 on the participants with a known change. Modality dropout with probability 0.35 was applied during training. The network was trained with AdamW (learning rate $10^{-3}$), early stopping on validation AUROC, and three seeds whose predictions were averaged. PET measures are added afterwards by the late-fusion model (Tier~2), because too few scanned participants have three-year outcomes to train them inside the network.
 
 \section{Contribution of each feature category}
 

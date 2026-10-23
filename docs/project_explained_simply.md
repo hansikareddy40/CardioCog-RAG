@@ -407,7 +407,10 @@ Finding and fixing your own mistakes is a strength. Tell your mentor about it yo
 | Did our image pipeline work? | Yes: it matches the experts' numbers (0.98) |
 | Is the 3D image model better than one simple number? | No (0.96 against 0.98) |
 | Can the model cope with missing information? | Yes, after training with hidden sections |
-| Did our own checks pass? | 17 of 17, re-run on 7 October 2026 |
+| Did our own checks pass? | 17 of 17, re-run on 22 October 2026 |
+| Can we predict cognitive decline, not only dementia? | Yes: a rise of 1 point or more in the CDR rating within 3 years is predicted at 0.86 (test) and 0.89 (unseen centres) |
+| Can we predict how much someone will decline? | Partly: the predicted 3-year change in the CDR rating is closer than guessing "no change" (average error 0.60 against 0.69) |
+| Does a network with one encoder per kind of information do better? | No, it matches XGBoost (0.934 against 0.937) |
 
 ---
 
@@ -428,10 +431,8 @@ These were in the original plan or would be natural next steps. **None of them h
 
 * Predicting dementia directly from the scan images (not possible with 5 cases; see section 10).
 * A model for cognitively normal people with a longer follow-up window, so that there are more cases to learn from and to test on.
-* Reporting models for other outcomes, such as "thinking scores got clearly worse" instead of a dementia diagnosis. The data table has this outcome ready, but no model results for it are reported.
 * CatBoost, an LSTM, and "attention over visits" explanations, which were named in the first plan. We used XGBoost and a GRU instead, and did not build the attention explanation.
 * MRI. It was never part of this project.
-* The chatbot writing a full report automatically for each prediction. Today the doctor's screen has a question box that searches the library; it answers questions, it does not write a report by itself.
 * Any test with real doctors or real patients.
 
 ---

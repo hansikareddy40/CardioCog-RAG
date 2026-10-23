@@ -11,7 +11,7 @@ This plan follows from the Phase 1 exploration (`reports/phase1_eda_summary.md` 
 | 3 Tabular and longitudinal models | Done | All five model types equal (AUROC about 0.94); cardiovascular features and visit history showed little incremental value in this cohort and setup. Results by baseline diagnosis in `reports/phase3_by_baseline_group.json` | Notebook 06 |
 | 4 PET numbers | Done | No measurable gain over the clinical model at 2 to 3 years | Notebook 08 |
 | 5 PET images | Done for amyloid | Pipeline validated against NACC SUVR (r = 0.98); amyloid-status CNN slightly below the SUVR baseline; Grad-CAM diffuse. Tau image quantification not done (no standard mask) | Notebook 11 |
-| 6 Fusion with missing modalities | Done | Modality dropout on the tabular model plus late fusion for PET. The intermediate-fusion deep network (approach C) was not built: the data gave no reason to expect a gain | Notebook 10 |
+| 6 Fusion with missing modalities | Done | Modality dropout on the tabular model plus late fusion for PET. An intermediate-fusion network with one encoder per modality and attention fusion was added later (`scripts/train_fusion_network.py`); it matches but does not beat XGBoost | Notebook 10 |
 | 7 Explainability | Done | SHAP by category with stability check | Notebook 07 |
 | 8 Validation | Done | Subgroups, thresholds, calibration, decision curve, survival check. Temporal validation and confirmed-conversion sensitivity analysis not done | Notebook 09 |
 | 9 Interface | Done | Streamlit prototype with modality checklist | `app/app.py` |

@@ -1,6 +1,8 @@
 # CardioCog-RAG
 
-**Explainable Early Prediction of Cognitive Decline Using Multimodal Data**
+**CardioCog: An Explainable AI Framework for Cognitive Health Assessment and Early Prediction of Cognitive Decline Using Cardiovascular, Genetic, and Clinical Factors**
+
+B.Tech project, Team D07, Department of Artificial Intelligence, Amrita Vishwa Vidyapeetham, Coimbatore. Supervisor: Dr. Manoj Bhat K.
 
 ## Overview
 
@@ -47,8 +49,14 @@ This section describes what was built. Items from the first plan that were not b
 - **RAG Pipeline** — hybrid retrieval over 11 open-access papers, with guardrails
 - **Local language model** — answers from retrieved passages with citations, falling back to direct quotation
 
+### Added to match the zeroth-review design
+- **Cognitive decline outcome:** CDR-SB rising by 1 point or more within 3 years (`scripts/train_decline.py`).
+- **Progression regression:** predicted 3-year change in CDR-SB, compared against predicting no change.
+- **Modality-encoder fusion network:** one encoder per kind of information, attention fusion, missing-modality tokens, a risk head and a progression head (`scripts/train_fusion_network.py`).
+- **Plain-language report** combining the risk, its main reasons and quoted evidence (`scripts/report.py`, button on the screen).
+
 ### Planned in the first proposal, not built
-CatBoost, an LSTM or Transformer over visits, temporal-attention explanations, a regression head for continuous decline, an image model for decline (only 5 conversions among the 446 participants with images), and automatic per-patient report generation.
+CatBoost (the five models already agree), an LSTM or Transformer over visits (a GRU was used; history adds little), attention over individual visits, DiCE counterfactuals (observational data cannot say what a patient should change), and an image model for decline (only 5 conversions among the 446 participants with images).
 
 ### Scope
 The project started as "cardiovascular risk factors, cognitive trajectories, APOE and PET to predict cognitive decline". After the data exploration the question was fixed as dementia within 3 years. Whether cardiovascular information adds predictive value beyond current cognitive status became a question the project tests, and its answer is reported as a finding.
@@ -116,6 +124,9 @@ python scripts/audit_data.py          # file-level audit
 python scripts/build_dataset.py       # cleaning, cohort, labels, splits
 python scripts/train_tabular.py       # five models and the feature-group experiment
 python scripts/train_by_baseline_group.py  # the same, separately for cognitively normal, MCI and all
+python scripts/train_decline.py       # cognitive decline (CDR-SB rise) and 3-year CDR-SB change
+python scripts/train_fusion_network.py  # modality-encoder fusion network
+python scripts/sensitivity_confirmed.py   # reversed dementia diagnoses removed
 python scripts/train_longitudinal.py  # trajectory features and GRU
 python scripts/explain.py             # SHAP
 python scripts/train_pet.py           # PET measures experiment
@@ -148,6 +159,10 @@ Dementia within 3 years, among participants not demented at the index visit; all
 - Amyloid and tau PET measures did not demonstrably improve the clinical model over 2 to 3 years, under two ways of matching scans to visits.
 - A PET-only image pipeline built from raw DICOM reproduces the PET core's amyloid SUVR (correlation 0.98 over 318 scans). A 3D CNN classifies amyloid status at AUROC 0.96, below the single SUVR measurement (0.98).
 - Training with modality dropout keeps predictions calibrated when whole sections of input are missing.
+- Cognitive decline (CDR-SB rise of 1 or more within 3 years): AUROC 0.86 test and 0.89 at held-out centres; 0.76 and 0.83 within cognitively normal participants; 0.75 within MCI. Cardiovascular information again adds about 0.
+- Progression regression (3-year change in CDR-SB): mean absolute error 0.60 against 0.69 for predicting no change (test); R2 0.23.
+- The modality-encoder fusion network matches XGBoost (AUROC 0.934 and 0.943 against 0.937 and 0.946). Its attention weights were nearly equal across modalities (18% to 21%), so SHAP remains the explanation used.
+- Removing the 7.7% of dementia diagnoses that were later reversed does not change the results (0.947 and 0.950).
 
 ## References
 

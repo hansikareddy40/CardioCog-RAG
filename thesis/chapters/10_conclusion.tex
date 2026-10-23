@@ -3,18 +3,19 @@
 
 \section{Conclusion}
 
-This thesis set out to estimate, for people without dementia at a clinic visit, the probability of a dementia diagnosis within three years, and to establish which kinds of information contribute to that estimate. Using 19,470 participants from the NACC database under a person-level split with nine held-out centres, the answers to the six research questions are as follows.
+This thesis set out to predict cognitive decline over the next three years for people without dementia at a clinic visit, to establish which kinds of information contribute to that prediction, and to explain each estimate in a form a clinician can check. Using the NACC database under a person-level split with nine held-out centres, the answers to the seven research questions are as follows.
 
 \begin{enumerate}[label=\textbf{RQ\arabic*.},leftmargin=*]
-\item Three-year conversion to dementia can be predicted with an AUROC of 0.94 in the combined cohort and 0.95 at held-out centres. Within participants with MCI the AUROC is about 0.84, and within cognitively normal participants about 0.88, with wide uncertainty.
-\item Cardiovascular and medical history adds about 0.001 AUROC once current cognition is known; it has limited incremental value in this cohort and setting.
+\item Progression to dementia within three years can be predicted with an AUROC of 0.94 in the combined cohort and 0.95 at held-out centres; within MCI the AUROC is about 0.84, and within cognitively normal participants about 0.88 with wide uncertainty. Cognitive decline measured as a one-point rise in CDR-SB is predicted with an AUROC of 0.86 (0.89 at held-out centres), 0.75 within MCI and 0.76 to 0.83 within cognitively normal participants, and the predicted change in CDR-SB is informative mainly for people who are already impaired.
+\item Cardiovascular and medical history adds about 0.001 AUROC for dementia and nothing measurable for CDR-SB decline once current cognition is known.
 \item Amyloid and tau PET measures did not produce a demonstrable gain over the clinical model with the follow-up currently available.
-\item Deep-learning models (a multilayer perceptron and an FT-Transformer) performed no better than logistic regression or gradient-boosted trees.
+\item Neither deep tabular models nor the modality-encoder fusion network performed better than logistic regression or gradient-boosted trees.
 \item Earlier visits added between 0.000 and 0.005 AUROC beyond the current visit.
 \item A model trained with modality dropout remained close to specialist models when whole categories of information were missing, whereas a standard model became badly calibrated.
+\item Each estimate can be explained with Shapley values, checked for implausible inputs, and summarised in a plain-language report with quoted published evidence.
 \end{enumerate}
 
-Most of the predictive information lies in the current cognitive and clinical state. The results are robust to the exclusion of participants with unknown outcomes, to reversed diagnoses and to retraining with different seeds, and the pipeline passed seventeen independent verification checks after two sources of information leakage had been found and corrected. Alongside the models, the work produced a PET image pipeline whose amyloid measurements agree with the PET core's (correlation 0.98), and a research prototype that checks the plausibility of its inputs and supports its output with an evidence assistant restricted to published sources.
+Most of the predictive information lies in the current cognitive and clinical state. The results are robust to the exclusion of participants with unknown outcomes, to reversed diagnoses and to retraining with different seeds, and the pipeline passed seventeen independent verification checks after two sources of information leakage had been found and corrected. Alongside the models, the work produced a PET image pipeline whose amyloid measurements agree with the PET core's (correlation 0.98), and a research prototype that checks the plausibility of its inputs and supports its output with a plain-language report and an evidence assistant restricted to published sources.
 
 \section{Scope for Further Research}
 

@@ -17,7 +17,7 @@ The finding that cardiovascular information adds little once other information i
 
 \section{Model Complexity}
 
-Logistic regression, random forest, XGBoost, a multilayer perceptron and an FT-Transformer performed within 0.007 AUROC of one another, with overlapping intervals. This agrees with comparisons on other tabular data \cite{gorishniy2021}. With a few dozen informative features, most of them strongly related to the outcome, there is little structure left for a more flexible model to exploit. The deep-learning idea that did prove useful was modality dropout, which addresses a practical problem (missing assessments) rather than raising discrimination.
+Logistic regression, random forest, XGBoost, a multilayer perceptron and an FT-Transformer performed within 0.007 AUROC of one another, with overlapping intervals. This agrees with comparisons on other tabular data \cite{gorishniy2021}. With a few dozen informative features, most of them strongly related to the outcome, there is little structure left for a more flexible model to exploit. The modality-encoder fusion network proposed at the start of the project gave the same result, and its attention weights were nearly uniform, so they could not serve as explanations. The deep-learning idea that did prove useful was modality dropout, which addresses a practical problem (missing assessments) rather than raising discrimination.
 
 \section{PET}
 

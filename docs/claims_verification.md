@@ -102,6 +102,15 @@ Reading: CDR-SB and diagnosis are measured at the index visit and the outcome co
 | PET: "pictures showing harmful proteins" | "Scans that use a tracer to give information about amyloid or tau build-up" | Scientific precision |
 | "0.84 is the fairer number" only | A three-row table: all, cognitively normal, MCI, with event counts | The target population must be explicit |
 
+## Added later (October 2026)
+
+| Claim | Produced by | Result file and value |
+|---|---|---|
+| Cognitive decline (CDR-SB rise of 1 or more within 3 years), AUROC 0.86 test, 0.89 held-out centres | `scripts/train_decline.py` | `reports/phase3b_decline_results.json` |
+| 3-year CDR-SB change: MAE 0.60 against 0.69 for no change (test), R2 0.23 | `scripts/train_decline.py` | same file |
+| Modality-encoder fusion network AUROC 0.934 / 0.943; attention 18% to 21% per modality | `scripts/train_fusion_network.py` | `reports/phase6b_fusion_network_results.json` |
+| Reversed diagnoses removed: AUROC 0.947 / 0.950 | `scripts/sensitivity_confirmed.py` | `reports/sensitivity_confirmed_conversion.json` |
+
 ## Planned, not run
 
-These appear in the original brief (`Knowledge.txt`) or the first README but have no output behind them. They are now labelled as planned wherever they are mentioned: CatBoost; an LSTM or Transformer over visits; temporal-attention explanations; a regression head for continuous decline; reported models for the CDR-SB rise outcome; a dementia model from PET images; tau image quantification; MRI; automatic per-patient report generation; temporal validation; any prospective or clinical test.
+These appear in the original brief (`Knowledge.txt`) or the review decks but have no output behind them: CatBoost; an LSTM or Transformer over visits; attention over individual visits; DiCE counterfactuals; a dementia model from PET images; tau image quantification; MRI; temporal validation; any prospective or clinical test.

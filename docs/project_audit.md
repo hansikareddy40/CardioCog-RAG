@@ -12,7 +12,7 @@ The project is sound. The question is clearly defined, the data are used correct
 
 | Point | Status | What to know |
 |---|---|---|
-| The title still says "Early Prediction of Cognitive Decline Using Cardiovascular Risk Factors..." but the work predicts **dementia within 3 years** | **Fix in the thesis** | An examiner will notice the mismatch. Use a title that says what was done (suggestions in `docs/thesis_outline.md`) and explain the scope change in section 1.2 of the thesis, as one of the reference theses does ("How the research question developed") |
+| The review title promises "early prediction of cognitive decline" but the first version of the work predicted only **dementia within 3 years** | **Fixed (23 October)**: a cognitive-decline outcome (CDR-SB rise) and a 3-year CDR-SB change regression were added, so the review title is accurate | An examiner will notice the mismatch. Use a title that says what was done (suggestions in `docs/thesis_outline.md`) and explain the scope change in section 1.2 of the thesis, as one of the reference theses does ("How the research question developed") |
 | "Early prediction" | **Limitation, word carefully** | Most of the signal comes from current cognition and the CDR rating, so the model mostly estimates progression **given the current stage**. Call it "short-term risk of progression to dementia", not "early detection before symptoms" |
 | The cardiovascular hypothesis was not confirmed | Not a weakness | A negative result measured properly (ablation, confidence interval, held-out centres, a survival check) is a valid finding. Present it as research question 1 and its answer |
 

@@ -112,6 +112,39 @@ Genetics & 3.5\% \\
 
 The most important individual features were CDR-SB, MCI status, the memory score, age and the executive score. The ranking was stable across eight bootstrap refits (Spearman correlation with the main model 0.89 to 0.97; 8 to 10 of the top ten features shared). Some associations are not causal: lower BMI was associated with higher predicted risk, which is consistent with weight loss in the years before a dementia diagnosis rather than a protective effect of higher weight.
 
+\section{Cognitive Decline as the Outcome}
+
+Table~\ref{tab:decline} reports the secondary outcome, a rise of at least one point in CDR-SB within three years. The cohort is slightly larger than for dementia (20,355 participants, 5,035 events) because the outcome can be observed in people who decline without reaching dementia.
+
+\begin{table}[H]
+\centering\small
+\caption{XGBoost for CDR-SB worsening of at least one point within three years (participants / events).}
+\label{tab:decline}
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+ & \multicolumn{2}{c}{Test set} & \multicolumn{2}{c}{Held-out centres} \\
+\cmidrule(lr){2-3}\cmidrule(l){4-5}
+Group & $n$ / events & AUROC (95\% CI) & $n$ / events & AUROC (95\% CI) \\
+\midrule
+All not demented & 2,375 / 572 & 0.858 (0.841--0.874) & 4,272 / 1,035 & 0.885 (0.875--0.896) \\
+Cognitively normal & 1,459 / 129 & 0.760 (0.714--0.805) & 2,690 / 215 & 0.831 (0.806--0.856) \\
+MCI & 766 / 399 & 0.748 (0.712--0.779) & 1,411 / 774 & 0.749 (0.723--0.776) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Decline is harder to predict than dementia, as expected for an outcome that includes small changes in a rating scale. The cognitively normal group is much better represented here (129 and 215 events instead of 24 and 37), so the estimate of 0.76 to 0.83 in that group is more reliable than the corresponding dementia result. Logistic regression gave almost the same result (0.854 and 0.883). The pattern of contributions matched the dementia outcome: cognitive tests made the largest unique contribution ($+0.029$ on the test set), and the cardiovascular category added nothing measurable ($+0.0004$, interval $-0.003$ to $+0.003$; held-out centres $0.000$).
+
+\subsection{Predicted Change in CDR-SB}
+
+For the 1,863 test participants and 3,231 held-out participants with a visit near the three-year mark, the mean change in CDR-SB was 0.48 and 0.63 points, and three quarters showed no change or an improvement. The regression model reduced the mean absolute error from 0.69 (predicting no change) to 0.60 on the test set and from 0.83 to 0.72 at the held-out centres, with $R^2$ of 0.23 and 0.18 and a Spearman correlation of 0.45. Within MCI the error fell from 1.90 to 1.59 points. Within cognitively normal participants, whose scores rarely change, the model was no better than predicting no change (0.17 against 0.17). The progression estimate is therefore informative for people who are already impaired and adds little for people who are not.
+
+\section{Modality-Encoder Fusion Network}
+
+The fusion network reached an AUROC of 0.934 (0.920--0.946) on the test set and 0.943 (0.935--0.951) at the held-out centres for dementia, against 0.937 and 0.946 for XGBoost; within MCI 0.831 and 0.837, and within cognitively normal participants 0.846 and 0.874. Its progression head reduced the mean absolute error from 0.72 to 0.65 on the test set. With modalities removed it behaved like the modality-dropout XGBoost model: without any cognitive information its AUROC was 0.72 and its Brier score 0.114, close to the specialist value.
+
+The attention weights, intended as an explanation of how much the network relied on each modality, were nearly equal: between 18\% and 21\% for every modality, on both evaluation sets and in every diagnostic group. They stayed almost equal even when the cognitive modalities were missing, because the learned missing tokens themselves carry the information. The attention weights therefore do not reveal which modality drives a prediction, in line with the wider observation that attention weights are not reliable explanations. The ablation results and SHAP values, which show that cognitive information dominates, remain the explanations used in this work. The fusion network demonstrates that the proposed architecture works and copes with missing modalities, but it offers no gain in accuracy over gradient-boosted trees on these data.
+
 \section{Longitudinal information}
 
 On landmark visits preceded by at least two earlier visits (test: 1,205 participants, 166 events; held-out centres: 2,254 participants, 326 events), adding the visit history produced only small changes (Table~\ref{tab:long}).

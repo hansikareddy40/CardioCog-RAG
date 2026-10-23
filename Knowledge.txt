@@ -13,9 +13,10 @@ are now out of date:
   3-year question. Whether cardiovascular information adds predictive value
   beyond current cognitive status is now a tested question, and its answer
   (little incremental value in this cohort and setup) is a finding.
-- CatBoost, LSTM/Transformer over visits, temporal attention and a regression
-  head were planned here but not built. XGBoost, an MLP, an FT-Transformer and
-  a GRU were used.
+- CatBoost, LSTM/Transformer over visits and temporal attention were planned
+  here but not built. XGBoost, an MLP, an FT-Transformer and a GRU were used.
+  A regression head for 3-year CDR-SB change, a cognitive-decline outcome and a
+  modality-encoder fusion network were added in October 2026.
 
 For what was actually done and found, read:
 - docs/project_explained_simply.md   (plain-language account of the whole project)
