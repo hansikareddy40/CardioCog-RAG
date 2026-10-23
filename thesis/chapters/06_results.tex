@@ -65,15 +65,16 @@ Within MCI the AUROC is about 0.84, which is the more informative estimate of ho
 \centering\small
 \caption{Contribution of each feature category (XGBoost, test set unless stated).}
 \label{tab:ablation}
+\setlength{\tabcolsep}{4pt}
 \begin{tabular}{@{}lccc@{}}
 \toprule
-Category & Alone & Gain when added to all others (test) & Gain (held-out centres) \\
+Category & Alone & Gain added last (test) & Gain added last (held-out) \\
 \midrule
 Cognitive tests & 0.896 & $+0.022$ ($+0.015$ to $+0.029$) & $+0.019$ ($+0.013$ to $+0.024$) \\
-Clinical stage (CDR-SB, diagnosis) & 0.897 & $+0.015$ ($+0.007$ to $+0.023$) & $+0.021$ ($+0.015$ to $+0.027$) \\
+Clinical stage & 0.897 & $+0.015$ ($+0.007$ to $+0.023$) & $+0.021$ ($+0.015$ to $+0.027$) \\
 Demographics & 0.671 & $+0.010$ ($+0.006$ to $+0.015$) & $+0.009$ ($+0.006$ to $+0.013$) \\
 Genetics (APOE) & 0.645 & $+0.003$ ($+0.002$ to $+0.004$) & $+0.001$ ($-0.000$ to $+0.002$) \\
-Cardiovascular and medical & 0.626 & $+0.001$ ($-0.000$ to $+0.003$) & $+0.001$ ($+0.000$ to $+0.002$) \\
+Cardiovascular/medical & 0.626 & $+0.001$ ($-0.000$ to $+0.003$) & $+0.001$ ($+0.000$ to $+0.002$) \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -87,7 +88,7 @@ Cognitive tests and clinical stage each reach an AUROC near 0.90 on their own an
 \label{fig:groups}
 \end{figure}
 
-\subsection{Cardiovascular information (research question 1)}
+\subsection{Cardiovascular information (research question 2)}
 
 On its own, the cardiovascular category carries some signal (AUROC 0.626). Added to demographics and APOE only, before any cognitive information, it improved the AUROC by 0.024 on the test set (0.011 to 0.039), but by only 0.004 at the held-out centres ($-0.006$ to $0.015$). Once cognitive information is present its contribution falls to about 0.001, with an interval that includes zero on the test set. Within the cognitively normal group the gain was 0.008 on the test set and 0.003 at the held-out centres, with intervals spanning zero. In this cohort and prediction setting, therefore, cardiovascular and medical history added little incremental predictive value beyond current cognitive status. This finding does not imply that vascular health is unimportant for the brain: the participants enter at a median age of 71, mid-life exposure is not observed, and vascular damage that has already occurred is likely to be reflected in the cognitive scores.
 
@@ -153,12 +154,13 @@ On landmark visits preceded by at least two earlier visits (test: 1,205 particip
 \centering\small
 \caption{Effect of earlier visits (paired gain over the landmark-only model).}
 \label{tab:long}
+\footnotesize
 \begin{tabular}{@{}lcc@{}}
 \toprule
 Model & Test AUROC (gain) & Held-out AUROC (gain) \\
 \midrule
 XGBoost, landmark visit only & 0.919 & 0.953 \\
-XGBoost with trajectory features & 0.922 ($+0.003$; $-0.006$ to $+0.011$) & 0.956 ($+0.003$; $-0.001$ to $+0.007$) \\
+XGBoost + trajectory features & 0.922 ($+0.003$; $-0.006$ to $+0.011$) & 0.956 ($+0.003$; $-0.001$ to $+0.007$) \\
 GRU over the visit sequence & 0.920 ($+0.000$; $-0.011$ to $+0.010$) & 0.958 ($+0.005$; $+0.001$ to $+0.008$) \\
 \bottomrule
 \end{tabular}
@@ -166,7 +168,7 @@ GRU over the visit sequence & 0.920 ($+0.000$; $-0.011$ to $+0.010$) & 0.958 ($+
 
 When current scores are known, the path that led to them adds little for a three-year prediction. This does not show that longitudinal modelling is of no value; a longer horizon, an earlier disease stage or more frequent measurement could give a different result.
 
-\section{PET measures (research question 2)}
+\section{PET measures (research question 3)}
 \label{sec:res_pet}
 
 On its own, amyloid status is strongly associated with progression: among participants with MCI in the held-out sets, about 34\% of amyloid-positive participants received a dementia diagnosis within two years, compared with about 7\% of amyloid-negative participants (36\% and 9\% under the strict scan-matching rule). Added to the clinical model, however, the PET measures did not produce a clear improvement under either matching rule. For example, with strict matching and a three-year horizon, the AUROC at the held-out centres was 0.939 without and 0.946 with amyloid (191 participants, 27 events; paired gain $-0.007$ to $+0.024$). The final late-fusion model scored 0.964 against 0.944 for the clinical model on 243 held-out scanned participants with 33 events, a gain of 0.020 whose interval ($-0.009$ to $+0.066$) includes zero. A modest benefit cannot be excluded, but it could not be demonstrated with the follow-up currently available.
