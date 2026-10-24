@@ -68,3 +68,13 @@ thesis/*.fdb_latexmk
 thesis/*.synctex.gz
 thesis/main.pdf
 thesis/build.log
+presentation/*.aux
+presentation/*.log
+presentation/*.nav
+presentation/*.out
+presentation/*.snm
+presentation/*.toc
+presentation/*.fls
+presentation/*.fdb_latexmk
+presentation/*.zip
+thesis/*.zip
