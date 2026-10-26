@@ -237,7 +237,7 @@ fill(sub.text_frame, [
     {"text": "Pilli Venkata Bhargav Reddy – CB.SC.U4AIE23329", "gap": 0},
     {"text": "Marella Venkata Mahidhar Reddy – CB.SC.U4AIE23354", "gap": 12},
     {"text": "Team D07", "gap": 4},
-    {"text": "Guide: Dr. Manoj Bhat K, Professor  |  Co-guide: Amrutha Veluppal, Professor", "gap": 0},
+    {"text": "Guide: Dr. Manoj Bhat K, Assistant Professor  |  Co-guide: Amrutha Veluppal, Assistant Professor", "gap": 0},
 ], size=14, color=GREY, bullets=False, align=PP_ALIGN.CENTER)
 
 # ================================================================ introduction

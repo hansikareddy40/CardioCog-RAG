@@ -163,7 +163,7 @@ names = [("Akula Akhil Vighnesh", "CB.SC.U4AIE23303"), ("Vada Gouri Hansika Redd
          ("Pilli Venkata Bhargav Reddy", "CB.SC.U4AIE23329"), ("Marella Venkata Mahidhar Reddy", "CB.SC.U4AIE23354")]
 text(s, 3.4, 3.5, 3.9, 1.8, [n for n, _ in names], size=17)
 text(s, 7.3, 3.5, 2.8, 1.8, [r for _, r in names], size=17)
-text(s, 1, 5.25, W - 2, 0.45, "Supervisor: Dr. Manoj Bhat K, Professor", size=18, align=PP_ALIGN.CENTER)
+text(s, 1, 5.25, W - 2, 0.45, "Supervisor: Dr. Manoj Bhat K, Assistant Professor", size=18, align=PP_ALIGN.CENTER)
 text(s, 1, 5.95, W - 2, 0.8, "AMRITA VISHWA VIDYAPEETHAM – SCHOOL OF ARTIFICIAL INTELLIGENCE, COIMBATORE", size=17, align=PP_ALIGN.CENTER)
 
 # ================================================================ 01 progress
