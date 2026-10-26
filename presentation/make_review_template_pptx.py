@@ -236,7 +236,8 @@ fill(sub.text_frame, [
     {"text": "Vada Gouri Hansika Reddy – CB.SC.U4AIE23304", "gap": 0},
     {"text": "Pilli Venkata Bhargav Reddy – CB.SC.U4AIE23329", "gap": 0},
     {"text": "Marella Venkata Mahidhar Reddy – CB.SC.U4AIE23354", "gap": 12},
-    {"text": "Team D07  |  Supervisor: Dr. Manoj Bhat K, Professor", "gap": 0},
+    {"text": "Team D07", "gap": 4},
+    {"text": "Guide: Dr. Manoj Bhat K, Professor  |  Co-guide: Amrutha Veluppal, Professor", "gap": 0},
 ], size=14, color=GREY, bullets=False, align=PP_ALIGN.CENTER)
 
 # ================================================================ introduction
@@ -622,8 +623,8 @@ table(s, X0, TOP + 0.05, W0, [2.9, 6.1], [
     ["RQ7 Explanation and evidence", "SHAP, plausibility checks, report with quoted evidence"],
 ], size=14, row_h=0.5, bold_col0=True)
 note(s, X0, 5.7, W0, 1.4, "Final takeaway",
-     "How a person is functioning today carries most of the three-year signal; vascular and genetic history leave "
-     "their trace in that measurement rather than adding to it.", size=15)
+     "Current cognitive and functional status carries most of the three-year signal; vascular and genetic history "
+     "add little once it is known.", size=15)
 
 # ================================================================ limitations
 s = frame("Limitations & Future Work")
