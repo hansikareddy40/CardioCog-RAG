@@ -1,0 +1,103 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[margin=2cm]{geometry}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage[hidelinks]{hyperref}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{3pt}
+\titleformat{\section}{\large\bfseries}{}{0pt}{}
+\titlespacing*{\section}{0pt}{10pt}{4pt}
+\newcommand{\q}[1]{\par\medskip\textbf{Q. #1}\par}
+\hypersetup{pdftitle={CardioCog: likely viva questions}}
+
+\begin{document}
+
+{\Large\bfseries CardioCog: likely viva questions and short answers\par}
+\smallskip
+Team D07 \quad|\quad Final review, 28 October 2026 \quad|\quad All numbers are from the thesis.
+
+\section{The main result}
+
+\q{An AUROC of 0.94 looks too good. Is there leakage?}
+No. Inputs come only from the index visit and the label from later visits. The figure is high because the cohort mixes cognitively normal people (1.6\% convert) with people with MCI (41.5\%), and diagnosis alone already gives 0.84. Within MCI the AUROC is 0.84; with all current-cognition information removed it falls to 0.75. The verification checks also confirm there is no leakage: features are identical when later visits are deleted, and shuffled labels give 0.508.
+
+\q{So is this really early prediction?}
+It is short-term prediction given the current clinical stage. For people with MCI it works well (0.84). For cognitively normal people the dementia result rests on only 24 and 37 converters, so we rely on the CDR-SB decline outcome there (0.76 to 0.83, with 129 and 215 events). A dedicated 5- to 10-year model for normal cognition is future work.
+
+\q{Why three years?}
+About 35\% of people with MCI progress within three years, so there are enough events. Longer horizons lose many participants to follow-up, and most PET scans are too recent.
+
+\q{What about people who left the study before three years?}
+They were excluded from the binary task rather than counted as negative. A Cox model that keeps them gives the same conclusions (concordance 0.891 test, 0.903 held-out).
+
+\section{Cardiovascular question (RQ2)}
+
+\q{Your title is about cardiovascular factors, but they add only 0.001. Why keep them?}
+Cardiovascular history was the original hypothesis, and testing it properly is part of the contribution. On its own it reaches 0.626; once cognition is known it adds 0.001 for dementia and nothing measurable for decline. The Cox model agrees (hypertension hazard ratio 0.995).
+
+\q{Does this mean vascular health does not matter?}
+No. Most evidence concerns midlife exposure, while our participants enter at a median age of 71 with yes/no history. Damage already caused by vascular disease is likely reflected in the cognitive scores the model sees.
+
+\section{Models}
+
+\q{Why did deep learning not help?}
+All five models are within 0.007 AUROC with overlapping intervals. With a few dozen strong features there is little structure left for a more flexible model, which matches other comparisons on tabular data (Gorishniy et al., 2021).
+
+\q{Why XGBoost as the main model?}
+It performed as well as the others, handles missing values natively and gives exact SHAP values.
+
+\q{What did the fusion network show?}
+It works (0.934 test, 0.943 held-out) but is no better than XGBoost, and its attention weights were 18--22\% for every modality, close to uniform (20\%). So we use SHAP and ablation for explanations, not attention.
+
+\q{Did earlier visits help?}
+Very little: +0.000 to +0.005 AUROC for trajectory features and the GRU.
+
+\section{PET}
+
+\q{Why not predict dementia from the PET images?}
+Only 5 of the 446 people with images later developed dementia. No model can learn from five events. We instead validated the image pipeline: our amyloid SUVR agrees with the NACC PET core's (Pearson $r$ = 0.977 over 318 scans).
+
+\q{Did PET summary values improve the clinical model?}
+Not demonstrably. Amyloid status is strongly associated with progression (in MCI, 34\% vs 7\% convert within two years), but the late-fusion gain was 0.964 vs 0.944 on 243 people with 33 events, and its interval ($-0.009$ to $+0.066$) includes zero.
+
+\q{Why did the 3D CNN lose to a single SUVR number?}
+The amyloid label is itself derived from cortical SUVR, so one number is close to the definition of the label (0.982 vs 0.960). Grad-CAM maps were diffuse, so we do not claim the CNN learned the cortical pattern.
+
+\section{Design and validation}
+
+\q{Why did the design change after the first review?}
+The first prototype had 198 people and 17 events; two runs of the same notebook gave 0.786 and 0.652. With so few events no conclusion is possible, so we moved to the full clinical cohort with thousands of events.
+
+\q{How did you split the data?}
+By participant, so no person appears in two sets. Nine of 46 centres were held out entirely; the rest were split 70/15/15 with a fixed seed. Everything learned from data was fitted on the training set only.
+
+\q{Is held-out centre validation external validation?}
+No. The centres belong to the same study and period. External and temporal validation on another cohort is the main next step.
+
+\q{Is the model calibrated and useful?}
+On the test set predicted risk equals observed risk (14.5\%), slope 1.01. At a 20\% threshold: sensitivity 83\%, specificity 88\%, negative predictive value 97\%. Net benefit is above treat-all and treat-none from 2\% to 60\% risk.
+
+\q{What happens when some data are missing?}
+A standard model becomes worse than the base rate without cognitive information (Brier 0.441). With modality dropout the same model stays close to a specialist model (0.115 vs 0.111).
+
+\q{What errors did the verification find?}
+Two leaks: education and race filled from a later visit (0.1\% of people), and PET scans matched to visits weeks before the scan. Both were fixed and every model retrained; results changed only in the third decimal. All 17 checks now pass.
+
+\section{Prototype and evidence assistant}
+
+\q{Can the prototype be used in a clinic?}
+No. It is a research tool, does not diagnose and does not recommend treatment, and says so on every screen. It flags contradictory inputs, and 27 of 28 behaviour checks pass; it over-predicts for MCI under 65 (35\% vs 27\%).
+
+\q{How do you stop the assistant from making things up?}
+It answers only from a fixed library, quotes passages with their source, and says when the library has no evidence. Results: correct source first for 32 of 32 questions, 8 of 8 advice questions flagged, 6 of 6 out-of-scope questions declined. The local model cited correctly only 22\% of the time, so direct quotation is the default. The library is small (11 papers) and the questions were written by us, which we state as a limitation.
+
+\section{Data and ethics}
+
+\q{Which data did you use?}
+NACC Freeze 74: 217,598 clinical visits from 57,038 participants at 46 centres (2005--2026), PET core summary values (amyloid for about 5,100 participants, tau for 2,724) and 599 raw PET scans from 446 participants.
+
+\q{How did you handle data privacy?}
+The data are used under the NACC data use agreement. Analysis ran on a local machine, no participant-level value or image appears in the thesis or repository, and every shared number is an aggregate.
+
+\end{document}

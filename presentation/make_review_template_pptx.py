@@ -283,7 +283,10 @@ table(s, X0, TOP + 0.1, W0, [0.7, 8.3], [
     ["5", "Do earlier visits help?"],
     ["6", "Can one model cope with whole categories of missing information?"],
     ["7", "Can each estimate be explained and supported with published evidence?"],
-], size=15, row_h=0.62)
+], size=15, row_h=0.58)
+box(s, X0, 6.3, W0, 0.7, [{"text": "RQ2 is the project's original hypothesis: that cardiovascular history improves the prediction. "
+                                    "The study tests it rather than assuming it.", "plain": True, "color": GREY}],
+    size=13, bullets=False)
 
 # ================================================================ literature
 s = frame("Literature Review")
@@ -334,6 +337,23 @@ note(s, 5.2, TOP, 4.3, 2.6, "Diagnosis",
 note(s, X0, 3.7, W0, 2.0, "Decision",
      "Move to the full clinical cohort with three-year outcomes and thousands of events, and treat PET images as a "
      "separate, validated pipeline.", size=15)
+
+# ================================================================ datasets
+s = frame("Datasets: Clinical Tables and PET")
+table(s, X0, TOP + 0.05, W0, [2.4, 3.8, 2.8], [
+    ["Source (NACC Freeze 74)", "Size", "Used for"],
+    ["Clinical visits (UDS forms)", "217,598 visits, 57,038 participants, 46 centres, 2005–2026", "All 48 features and both outcomes"],
+    ["Amyloid PET summary (PET core)", "About 5,100 participants; Centiloid value and amyloid status", "PET late-fusion model"],
+    ["Tau PET summary (PET core)", "2,724 participants; meta-temporal and entorhinal SUVR", "PET late-fusion model"],
+    ["Raw PET images (DICOM)", "599 scans (318 amyloid, 232 tau, 49 FDG) from 446 participants, about 100 GB",
+     "Image pipeline: SUVR check and 3D CNN"],
+], size=13, row_h=0.62)
+note(s, X0, 4.85, 4.3, 2.2, "Clinical table",
+     "2,649 columns, mostly empty; 114 variables mapped by hand, giving 48 features. The test battery changed in 2015, "
+     "so scores were converted to adjusted z-scores.", size=13)
+note(s, 5.2, 4.85, 4.3, 2.2, "PET images",
+     "Only 5 of the 446 people with images later developed dementia, so images were used to check measurements, "
+     "not to predict dementia.", size=13)
 
 # ================================================================ data
 s = frame("Data: NACC Freeze 74 and the Cohort")
