@@ -12,60 +12,69 @@ from matplotlib.patches import FancyArrowPatch, Rectangle
 OUT = Path(__file__).resolve().parent / "figures" / "project_block_diagram"
 plt.rcParams["font.family"] = ["Arial", "DejaVu Sans"]
 
-fig = plt.figure(figsize=(15, 6.2))
+fig = plt.figure(figsize=(15, 7.2))
 ax = fig.add_axes([0, 0, 1, 1])
 ax.set_xlim(0, 150)
-ax.set_ylim(10, 72)
+ax.set_ylim(0, 72)
 ax.axis("off")
 
 
-def box(x, y, w, h, text, size=12):
+def box(x, y, w, h, text, size=12, bold=False):
     ax.add_patch(Rectangle((x, y), w, h, fc="white", ec="black", lw=1.3))
-    ax.text(x + w / 2, y + h / 2, text, ha="center", va="center", fontsize=size, linespacing=1.4)
+    ax.text(x + w / 2, y + h / 2, text, ha="center", va="center", fontsize=size,
+            fontweight="bold" if bold else "normal", linespacing=1.4)
 
 
 def arrow(x1, y1, x2, y2):
-    ax.add_patch(FancyArrowPatch((x1, y1), (x2, y2), arrowstyle="-|>", mutation_scale=14,
+    ax.add_patch(FancyArrowPatch((x1, y1), (x2, y2), arrowstyle="-|>", mutation_scale=15,
                                  color="black", lw=1.3, shrinkA=0, shrinkB=0))
 
 
-MY, MH = 44, 12          # main row
-mid = MY + MH / 2
+# inputs
+ax.add_patch(Rectangle((3, 30), 24, 39, fc="white", ec="black", lw=1.3))
+ax.text(15, 66, "NACC Dataset", ha="center", va="center", fontsize=12.5, fontweight="bold")
+inputs = ["Demographics", "Cardiovascular", "Cognitive Tests", "Clinical Stage", "Genetics (APOE)", "PET"]
+for i, name in enumerate(inputs):
+    box(5.5, 60 - 3.8 - i * 4.8, 19, 3.8, name, size=10.5)
 
-box(2, MY, 18, MH, "NACC\nDataset")
-box(26, MY, 18, MH, "Data\nPreprocessing")
-arrow(20, mid, 26, mid)
+# row 1
+RY, RH, BW = 44, 11, 21
+xs = [36, 64, 92, 120]
+row1 = ["Data\nPreprocessing", "Feature\nExtraction", "Train / Validation /\nTest Split"]
+for x, t in zip(xs, row1):
+    box(x, RY, BW, RH, t)
+arrow(27, RY + RH / 2, xs[0], RY + RH / 2)
+for a, b in zip(xs[:-1], xs[1:]):
+    arrow(a + BW, RY + RH / 2, b, RY + RH / 2)
 
-groups = ["Demographics", "Cardiovascular", "Cognitive Tests", "Clinical Stage", "Genetics"]
-gh, step = 5, 6.5
-gys = [mid + 2 * step - gh / 2 - i * step for i in range(5)]
-for gy, g in zip(gys, groups):
-    box(52, gy, 20, gh, g, size=10.5)
-    arrow(44, mid, 52, gy + gh / 2)
-    arrow(72, gy + gh / 2, 80, mid + (gy + gh / 2 - mid) * 0.32)
+# model training, with the models inside
+ax.add_patch(Rectangle((120, 24), 27, RY + RH - 24, fc="white", ec="black", lw=1.3))
+ax.text(133.5, RY + RH - 3.2, "Model Training", ha="center", va="center", fontsize=12)
+ax.text(133.5, 36.0, "Logistic Regression\nRandom Forest\nXGBoost\nMLP\nFT-Transformer\nFusion Network\nPET Late Fusion",
+        ha="center", va="center", fontsize=10, linespacing=1.4)
 
-box(80, MY, 16, MH, "Encoders")
-box(102, MY, 18, MH, "Attention\nFusion")
-box(126, MY, 20, MH, "Risk\nPrediction")
-arrow(96, mid, 102, mid)
-arrow(120, mid, 126, mid)
+# PET image branch
+pet_y = 60 - 3.8 - 5 * 4.8 + 1.9          # centre of the PET input box
+PH = 10
+pet = [(36, "PET Image\nPreprocessing"), (64, "3D CNN"), (92, "Amyloid Status\nClassification")]
+for x, t in pet:
+    box(x, pet_y - PH / 2, BW, PH, t)
+arrow(24.5, pet_y, 36, pet_y)
+for (xa, _), (xb, _) in zip(pet[:-1], pet[1:]):
+    arrow(xa + BW, pet_y, xb, pet_y)
+arrow(pet[-1][0] + BW, pet_y, 120, pet_y)   # PET branch into model training
 
-# bottom row
-BY, BH = 16, 10
-bmid = BY + BH / 2
-box(2, BY, 18, BH, "PET Scans")
-box(26, BY, 18, BH, "3D CNN")
-box(50, BY, 18, BH, "Amyloid\nStatus")
-arrow(11, MY, 11, BY + BH)
-arrow(20, bmid, 26, bmid)
-arrow(44, bmid, 50, bmid)
+# row 2 (right to left)
+R2Y = 5
+row2 = [(120, 27, "Evaluation"), (92, BW, "SHAP\nExplanation"), (64, BW, "Risk\nPrediction"), (36, BW, "Web\nApplication")]
+for x, w, t in row2:
+    box(x, R2Y, w, RH, t)
+arrow(133.5, 24, 133.5, R2Y + RH)
+for (xa, wa, _), (xb, wb, _) in zip(row2[:-1], row2[1:]):
+    arrow(xa, R2Y + RH / 2, xb + wb, R2Y + RH / 2)
 
-box(78, BY, 18, BH, "RAG Evidence\nAssistant", size=11)
-box(102, BY, 18, BH, "Web\nApplication")
-box(126, BY, 20, BH, "SHAP\nExplanation")
-arrow(136, MY, 136, BY + BH)
-arrow(126, bmid, 120, bmid)
-arrow(96, bmid, 102, bmid)
+box(3, R2Y, 24, RH, "RAG Evidence\nAssistant")
+arrow(27, R2Y + RH / 2, 36, R2Y + RH / 2)
 
 fig.savefig(OUT.with_suffix(".png"), dpi=200, facecolor="white")
 fig.savefig(OUT.with_suffix(".pdf"), facecolor="white")
