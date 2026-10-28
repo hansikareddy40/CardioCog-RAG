@@ -50,8 +50,18 @@ for a, b in zip(xs[:-1], xs[1:]):
 # model training, with the models inside
 ax.add_patch(Rectangle((120, 24), 27, RY + RH - 24, fc="white", ec="black", lw=1.3))
 ax.text(133.5, RY + RH - 3.2, "Model Training", ha="center", va="center", fontsize=12)
-ax.text(133.5, 36.5, "Logistic Regression\nRandom Forest\nXGBoost\nMLP\nFT-Transformer\nFusion Network",
+ax.text(133.5, 36.0, "Logistic Regression\nRandom Forest\nXGBoost\nMLP\nFT-Transformer\nFusion Network\nPET Late Fusion",
         ha="center", va="center", fontsize=10, linespacing=1.4)
+
+# PET image branch
+pet_y = 60 - 3.8 - 5 * 4.8 + 1.9          # centre of the PET input box
+PH = 10
+pet = [(36, "PET Image\nPreprocessing"), (64, "3D CNN"), (92, "Amyloid Status\nClassification")]
+for x, t in pet:
+    box(x, pet_y - PH / 2, BW, PH, t)
+arrow(24.5, pet_y, 36, pet_y)
+for (xa, _), (xb, _) in zip(pet[:-1], pet[1:]):
+    arrow(xa + BW, pet_y, xb, pet_y)
 
 # row 2 (right to left)
 R2Y = 5
