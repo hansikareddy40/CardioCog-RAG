@@ -48,10 +48,14 @@ for a, b in zip(xs[:-1], xs[1:]):
     arrow(a + BW, RY + RH / 2, b, RY + RH / 2)
 
 # model training, with the models inside
-ax.add_patch(Rectangle((120, 24), 27, RY + RH - 24, fc="white", ec="black", lw=1.3))
-ax.text(133.5, RY + RH - 3.2, "Model Training", ha="center", va="center", fontsize=12)
-ax.text(133.5, 36.0, "Logistic Regression\nRandom Forest\nXGBoost\nMLP\nFT-Transformer\nFusion Network\nPET Late Fusion",
+ax.add_patch(Rectangle((120, 35), 27, RY + RH - 35, fc="white", ec="black", lw=1.3))
+ax.text(133.5, RY + RH - 3.0, "Model Training", ha="center", va="center", fontsize=12)
+ax.text(133.5, 43.2, "Logistic Regression\nRandom Forest\nXGBoost\nMLP\nFT-Transformer\nFusion Network",
         ha="center", va="center", fontsize=10, linespacing=1.4)
+
+# PET late fusion, after model training
+box(120, 22, 27, 8, "PET Late Fusion")
+arrow(133.5, 35, 133.5, 30)
 
 # PET image branch
 pet_y = 60 - 3.8 - 5 * 4.8 + 1.9          # centre of the PET input box
@@ -62,14 +66,15 @@ for x, t in pet:
 arrow(24.5, pet_y, 36, pet_y)
 for (xa, _), (xb, _) in zip(pet[:-1], pet[1:]):
     arrow(xa + BW, pet_y, xb, pet_y)
-arrow(pet[-1][0] + BW, pet_y, 120, pet_y)   # PET branch into model training
+ax.plot([pet[-1][0] + BW, 116.5, 116.5], [pet_y, pet_y, 26], color="black", lw=1.3)   # PET branch into late fusion
+arrow(116.5, 26, 120, 26)
 
 # row 2 (right to left)
 R2Y = 5
 row2 = [(120, 27, "Evaluation"), (92, BW, "SHAP\nExplanation"), (64, BW, "Risk\nPrediction"), (36, BW, "Web\nApplication")]
 for x, w, t in row2:
     box(x, R2Y, w, RH, t)
-arrow(133.5, 24, 133.5, R2Y + RH)
+arrow(133.5, 22, 133.5, R2Y + RH)
 for (xa, wa, _), (xb, wb, _) in zip(row2[:-1], row2[1:]):
     arrow(xa, R2Y + RH / 2, xb + wb, R2Y + RH / 2)
 
